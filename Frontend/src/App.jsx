@@ -45,8 +45,8 @@ function RoleProtectedRoute({ children, allowedRoles }) {
 function App() {
   return (
     <Router>
-      <DataProvider>
-        <AuthProvider>
+      <AuthProvider>
+        <DataProvider>
           <Routes>
             <Route path="/login" element={<Login />} />
             
@@ -122,8 +122,8 @@ function App() {
 
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-        </AuthProvider>
-      </DataProvider>
+        </DataProvider>
+      </AuthProvider>
     </Router>
   );
 }
