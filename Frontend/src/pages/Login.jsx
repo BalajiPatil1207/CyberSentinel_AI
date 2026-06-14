@@ -57,14 +57,14 @@ export function Login() {
     return isValid;
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
     setError('');
     
     if (!validateForm()) return;
 
     if (isLogin) {
-      const result = login(email, password);
+      const result = await login(email, password);
       if (result.success) {
         // Redirection handled dynamically inside DashboardRedirect helper or role based
         const storedUsers = JSON.parse(localStorage.getItem("cs_users")) || [];
@@ -75,7 +75,7 @@ export function Login() {
         setError(result.message);
       }
     } else {
-      const result = register(name, email, password, role);
+      const result = await register(name, email, password, role);
       if (result.success) {
         navigate(role === 'Employee' ? '/phishing-detection' : '/dashboard');
       } else {
