@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
-import { throwBadRequest, throwUnauthorized } from "../utils/ApiError.js";
+import { throwBadRequest, throwUnauthorized, throwNotFound } from "../utils/ApiError.js";
 import { sendSuccess, sendCreated } from "../utils/apiResponse.js";
 
 /**
@@ -125,14 +125,73 @@ const getMe = async (req, res, next) => {
   }
 };
 
+/**
+ * @desc    Get all registered users
+ * @route   GET /api/users
+ * @access  Protected (Super Admin only)
+ */
+const getUsers = async (req, res, next) => {
+  try {
+    const users = await User.find({}).select("-password");
+    return sendSuccess(res, users, "All registered users retrieved successfully!");
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Toggle user status (Active/Inactive)
+ * @route   PUT /api/users/:id/status
+ * @access  Protected (Super Admin only)
+ */
+const updateUserStatus = async (req, res, next) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  try {
+    if (!status || !["Active", "Inactive"].includes(status)) {
+      throwBadRequest("Please provide a valid status ('Active' or 'Inactive').");
+    }
+
+    const user = await User.findById(id);
+    if (!user) {
+      throwNotFound(`User with ID ${id} not found.`);
+    }
+
+    // Do not allow deactivating the main super admin account
+    if (user.email === "admin@patilcybershield.com" && status === "Inactive") {
+      throwBadRequest("The primary Super Admin user account cannot be deactivated.");
+    }
+
+    user.status = status;
+    await user.save();
+
+    const updatedUser = {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      status: user.status,
+    };
+
+    return sendSuccess(res, updatedUser, `User status updated to ${status} successfully!`);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default {
   register,
   login,
   getMe,
+  getUsers,
+  updateUserStatus,
 };
 
 export {
   register,
   login,
   getMe,
+  getUsers,
+  updateUserStatus,
 };
