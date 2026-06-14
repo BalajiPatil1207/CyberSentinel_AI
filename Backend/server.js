@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
+import helmet from "helmet";
+import { rateLimit } from "express-rate-limit";
 import connectDB from "./config/db.js";
 import errorHandler from "./middlewares/errorMiddleware.js";
 import ApiResponse, { sendSuccess, sendCreated, sendPaginated } from "./utils/apiResponse.js";
@@ -19,6 +21,23 @@ dotenv.config();
 
 // Create Express app
 const app = express();
+
+// Secure headers via Helmet
+app.use(helmet());
+
+// Rate Limiting to prevent brute-force attacks
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 150, // Limit each IP to 150 requests per windowMs
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    statusCode: 429,
+    message: "Too many requests from this IP address. Please try again after 15 minutes."
+  }
+});
+app.use("/api", apiLimiter);
 
 // Set up middlewares
 app.use(cors());
