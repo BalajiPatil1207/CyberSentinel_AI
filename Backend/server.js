@@ -9,6 +9,9 @@ import ApiError, { throwBadRequest, throwUnauthorized, throwForbidden, throwNotF
 import authRoutes from "./routes/authRoutes.js";
 import threatRoutes from "./routes/threatRoutes.js";
 import incidentRoutes from "./routes/incidentRoutes.js";
+import securityRoutes from "./routes/securityRoutes.js";
+import alertRoutes from "./routes/alertRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 
 // Load environment variables
 dotenv.config();
@@ -30,6 +33,9 @@ app.use("/api/auth", authRoutes);
 // Cybersecurity routes
 app.use("/api/threats", threatRoutes);
 app.use("/api/incidents", incidentRoutes);
+app.use("/api/security", securityRoutes);
+app.use("/api/alerts", alertRoutes);
+app.use("/api/users", userRoutes);
 
 // Root route (Health check)
 app.get("/", (req, res) => {
