@@ -9,21 +9,25 @@ import { useAuth } from '../context/AuthContext';
 import { cn } from '../components/Card';
 
 const navItems = [
-  { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { path: '/threat-monitoring', icon: Activity, label: 'Threat Monitoring' },
-  { path: '/phishing-detection', icon: ShieldAlert, label: 'Phishing Detection' },
-  { path: '/malware-analysis', icon: Search, label: 'Malware Analysis' },
-  { path: '/vulnerability-scanner', icon: Shield, label: 'Vulnerability Scanner' },
-  { path: '/incident-response', icon: AlertTriangle, label: 'Incident Response' },
-  { path: '/ai-assistant', icon: MessageSquare, label: 'AI Assistant' },
-  { path: '/alerts', icon: Bell, label: 'Alerts' },
-  { path: '/reports', icon: FileText, label: 'Reports' },
-  { path: '/users', icon: Users, label: 'User Management' },
-  { path: '/settings', icon: Settings, label: 'Settings' },
+  { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', roles: ['Super Admin', 'Security Analyst'] },
+  { path: '/threat-monitoring', icon: Activity, label: 'Threat Monitoring', roles: ['Super Admin', 'Security Analyst'] },
+  { path: '/phishing-detection', icon: ShieldAlert, label: 'Phishing Detection', roles: ['Super Admin', 'Security Analyst', 'Employee'] },
+  { path: '/malware-analysis', icon: Search, label: 'Malware Analysis', roles: ['Super Admin', 'Security Analyst'] },
+  { path: '/vulnerability-scanner', icon: Shield, label: 'Vulnerability Scanner', roles: ['Super Admin', 'Security Analyst'] },
+  { path: '/incident-response', icon: AlertTriangle, label: 'Incident Response', roles: ['Super Admin', 'Security Analyst'] },
+  { path: '/ai-assistant', icon: MessageSquare, label: 'AI Assistant', roles: ['Super Admin', 'Security Analyst', 'Employee'] },
+  { path: '/alerts', icon: Bell, label: 'Alerts', roles: ['Super Admin', 'Security Analyst', 'Employee'] },
+  { path: '/reports', icon: FileText, label: 'Reports', roles: ['Super Admin', 'Security Analyst'] },
+  { path: '/users', icon: Users, label: 'User Management', roles: ['Super Admin'] },
+  { path: '/settings', icon: Settings, label: 'Settings', roles: ['Super Admin', 'Security Analyst', 'Employee'] },
 ];
 
 export function Sidebar() {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
+
+  const filteredNavItems = navItems.filter(
+    (item) => !item.roles || (user && item.roles.includes(user.role))
+  );
 
   return (
     <aside className="w-64 h-screen glass-panel rounded-none border-t-0 border-b-0 border-l-0 fixed left-0 top-0 flex flex-col z-20">
@@ -34,7 +38,7 @@ export function Sidebar() {
       
       <div className="flex-1 overflow-y-auto py-4">
         <nav className="space-y-1 px-4">
-          {navItems.map((item) => (
+          {filteredNavItems.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
