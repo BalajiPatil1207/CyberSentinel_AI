@@ -5,10 +5,12 @@ import {
   aiChat, 
   getChatHistory, 
   malwareAnalyze,
+  malwareUpload,
   getVulnerabilities,
   patchVulnerability
 } from "../controllers/securityController.js";
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
+import { memoryUpload } from "../middlewares/memoryUpload.js";
 
 const router = express.Router();
 
@@ -41,5 +43,6 @@ router.get("/ai-chat/history", getChatHistory);
 
 // Malware sandbox analysis (Allowed for all logged-in roles)
 router.post("/malware-analyze", malwareAnalyze);
+router.post("/malware-upload", memoryUpload("malware"), malwareUpload);
 
 export default router;
