@@ -106,7 +106,7 @@ const runPhishingScan = async (req, res, next) => {
       const threatSeverity = score >= 90 ? "Critical" : "High";
 
       // 1. Save Threat signature
-      await Threat.create({
+      const threatObj = await Threat.create({
         type: "Phishing Attempt",
         source: threatSource,
         target: threatTarget,
@@ -115,11 +115,18 @@ const runPhishingScan = async (req, res, next) => {
       });
 
       // 2. Generate Security Alert
-      await Alert.create({
+      const alertObj = await Alert.create({
         message: `High risk Phishing attempt detected (${score}/100) on target ${threatTarget}!`,
         type: score >= 90 ? "critical" : "warning",
         isRead: false,
       });
+
+      // 3. Emit real-time WebSockets notifications
+      const io = req.app.get("io");
+      if (io) {
+        io.emit("new-threat", threatObj);
+        io.emit("new-alert", alertObj);
+      }
     }
 
     const report = {
@@ -186,11 +193,16 @@ const runVulnScan = async (req, res, next) => {
 
       // Trigger critical/warning Alert if severity is High or Critical
       if (vuln.severity === "High" || vuln.severity === "Critical") {
-        await Alert.create({
+        const alertObj = await Alert.create({
           message: `Vulnerability ${vuln.cve} (${vuln.severity}) identified on scanned target ${target}!`,
           type: "critical",
           isRead: false,
         });
+
+        const io = req.app.get("io");
+        if (io) {
+          io.emit("new-alert", alertObj);
+        }
       }
     }
 
@@ -313,7 +325,7 @@ const malwareAnalyze = async (req, res, next) => {
 
     if (isMalicious) {
       // Log Threat
-      await Threat.create({
+      const threatObj = await Threat.create({
         type: "Malware Detected",
         source: `Sandbox Analysis: ${fileName}`,
         target: "Security Incident Desk",
@@ -322,11 +334,18 @@ const malwareAnalyze = async (req, res, next) => {
       });
 
       // Trigger Alert
-      await Alert.create({
+      const alertObj = await Alert.create({
         message: `Malware payload (${score}/100) identified in sandbox analysis of ${fileName}!`,
         type: score >= 85 ? "critical" : "warning",
         isRead: false,
       });
+
+      // Emit socket alerts
+      const io = req.app.get("io");
+      if (io) {
+        io.emit("new-threat", threatObj);
+        io.emit("new-alert", alertObj);
+      }
     }
 
     const report = {

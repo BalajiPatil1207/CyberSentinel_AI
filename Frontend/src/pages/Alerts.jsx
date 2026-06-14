@@ -32,7 +32,7 @@ export function Alerts() {
             ) : (
               alerts.map((alert) => (
                 <div 
-                  key={alert.id} 
+                  key={alert._id || alert.id} 
                   className={`p-4 rounded-xl border flex items-start justify-between ${
                     alert.isRead ? 'bg-slate-900/30 border-slate-800' : 'bg-slate-800/50 border-slate-700 shadow-md'
                   }`}
@@ -58,11 +58,11 @@ export function Alerts() {
                       <p className={`text-sm ${alert.isRead ? 'text-slate-400' : 'text-slate-200 font-medium'}`}>
                         {alert.message}
                       </p>
-                      <p className="text-xs text-slate-500 mt-2">{new Date(alert.timestamp).toLocaleString()}</p>
+                      <p className="text-xs text-slate-500 mt-2">{new Date(alert.timestamp || alert.createdAt).toLocaleString()}</p>
                     </div>
                   </div>
                   {!alert.isRead && (
-                    <Button variant="ghost" className="h-8 w-8 p-0" onClick={() => markAlertAsRead(alert.id)}>
+                    <Button variant="ghost" className="h-8 w-8 p-0" onClick={() => markAlertAsRead(alert._id || alert.id)}>
                       <Check className="w-4 h-4 text-slate-400" />
                     </Button>
                   )}

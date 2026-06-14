@@ -12,7 +12,7 @@ export function ThreatMonitoring() {
   const [selectedThreat, setSelectedThreat] = useState(null);
 
   const filteredThreats = threats.filter(t => 
-    t.id.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    (t._id || t.id).toLowerCase().includes(searchTerm.toLowerCase()) || 
     t.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
     t.source.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -49,7 +49,7 @@ export function ThreatMonitoring() {
           <div className="space-y-4">
             {filteredThreats.map((threat) => (
               <div 
-                key={threat.id} 
+                key={threat._id || threat.id} 
                 className="flex items-center justify-between p-4 rounded-xl border border-slate-800 bg-slate-900/30 hover:bg-slate-800/50 transition-colors cursor-pointer"
                 onClick={() => setSelectedThreat(threat)}
               >
@@ -72,14 +72,14 @@ export function ThreatMonitoring() {
                       </Badge>
                     </h4>
                     <div className="text-sm text-slate-400 mt-1 flex gap-4">
-                      <span>ID: {threat.id}</span>
+                      <span>ID: {(threat._id || threat.id).substring(0, 8)}</span>
                       <span>Source: {threat.source}</span>
                       <span>Target: {threat.target}</span>
                     </div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="text-sm text-slate-400">{new Date(threat.timestamp).toLocaleString()}</span>
+                  <span className="text-sm text-slate-400">{new Date(threat.timestamp || threat.createdAt).toLocaleString()}</span>
                   <div className="mt-2">
                     <Badge variant={threat.status === 'Active' ? 'destructive' : 'success'}>
                       {threat.status}
@@ -111,7 +111,7 @@ export function ThreatMonitoring() {
             <CardHeader>
               <CardTitle className="text-xl flex items-center gap-3">
                 <ShieldAlert className="text-red-500 w-6 h-6" />
-                Threat Details: {selectedThreat.id}
+                Threat Details: {(selectedThreat._id || selectedThreat.id)}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -144,9 +144,9 @@ export function ThreatMonitoring() {
                     <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded border border-slate-800 bg-slate-900/50">
                       <div className="flex items-center justify-between mb-1">
                         <div className="font-bold text-slate-200">Threat Detected</div>
-                        <time className="text-xs text-slate-500">{new Date(selectedThreat.timestamp).toLocaleTimeString()}</time>
+                        <time className="text-xs text-slate-500">{new Date(selectedThreat.timestamp || selectedThreat.createdAt).toLocaleTimeString()}</time>
                       </div>
-                      <div className="text-slate-400 text-sm">System automatically flagged anomalous activity.</div>
+                      <div className="text-slate-400 text-sm">System flagged anomalous activity from threat feed.</div>
                     </div>
                   </div>
                 </div>

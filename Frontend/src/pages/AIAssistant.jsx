@@ -3,11 +3,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/Card';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { Bot, User, Send, Sparkles } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { useData } from '../context/DataContext';
 
 export function AIAssistant() {
+  const { getAuthHeaders } = useAuth();
+  const { fetchData } = useData();
   const [messages, setMessages] = useState([
     {
-      id: 1,
+      id: 'default',
       role: 'ai',
       content: 'Hello! I am your ABC Cyber Shield AI Assistant. I can help you analyze threats, explain vulnerabilities, or suggest security policies. How can I assist you today?'
     }
@@ -31,28 +35,86 @@ export function AIAssistant() {
     scrollToBottom();
   }, [messages, isTyping]);
 
-  const handleSend = (text) => {
+  // Load chat history from backend on mount
+  useEffect(() => {
+    const loadHistory = async () => {
+      try {
+        const response = await fetch('/api/security/ai-chat/history', {
+          headers: getAuthHeaders()
+        });
+        if (response.ok) {
+          const resData = await response.json();
+          if (resData.success && resData.data.length > 0) {
+            // Map messages to include an ID if missing
+            const mapped = resData.data.map((m, idx) => ({
+              id: m._id || idx,
+              role: m.role,
+              content: m.content
+            }));
+            setMessages([
+              {
+                id: 'default',
+                role: 'ai',
+                content: 'Welcome back! Here is our security consultation history. How can I help you today?'
+              },
+              ...mapped
+            ]);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load chat history:", err);
+      }
+    };
+
+    loadHistory();
+  }, []);
+
+  const handleSend = async (text) => {
     const query = text || input;
     if (!query.trim()) return;
 
-    const userMessage = { id: Date.now(), role: 'user', content: query };
+    // Push user query immediately into local state
+    const userMsgId = Date.now().toString();
+    const userMessage = { id: userMsgId, role: 'user', content: query };
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsTyping(true);
 
-    // Simulate AI response
-    setTimeout(() => {
-      let responseContent = "I've analyzed your request. Based on the current security context, everything looks stable, but I recommend checking the latest vulnerability scan results.";
-      
-      if (query.toLowerCase().includes('cve')) {
-        responseContent = "CVE-2024-1024 is a critical buffer overflow vulnerability found in OpenSSL. It allows remote attackers to execute arbitrary code. Recommended action: Patch the system immediately to the latest version.";
-      } else if (query.toLowerCase().includes('phishing')) {
-        responseContent = "To mitigate a phishing attack: 1) Isolate the affected user's machine. 2) Reset their credentials. 3) Block the malicious sender domain at the email gateway. 4) Run a full system malware scan.";
-      }
+    try {
+      const response = await fetch('/api/security/ai-chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders()
+        },
+        body: JSON.stringify({ prompt: query })
+      });
 
-      setMessages(prev => [...prev, { id: Date.now(), role: 'ai', content: responseContent }]);
+      const resData = await response.json();
+      if (response.ok && resData.success) {
+        const aiReply = { id: Date.now().toString() + '-ai', role: 'ai', content: resData.data.reply };
+        setMessages(prev => [...prev, aiReply]);
+        // Refresh dashboard feeds in background in case triggers occurred
+        fetchData();
+      } else {
+        const errReply = { 
+          id: Date.now().toString() + '-err', 
+          role: 'ai', 
+          content: 'Sorry, I encountered an issue communicating with my analysis subsystem. Please try again.' 
+        };
+        setMessages(prev => [...prev, errReply]);
+      }
+    } catch (err) {
+      console.error(err);
+      const errReply = { 
+        id: Date.now().toString() + '-err', 
+        role: 'ai', 
+        content: 'Connection issue. Please verify the security gateway is running.' 
+      };
+      setMessages(prev => [...prev, errReply]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   return (
@@ -84,7 +146,7 @@ export function AIAssistant() {
                     ? 'bg-slate-900/80 border border-slate-800 text-slate-300 rounded-tl-none' 
                     : 'bg-brand-blue text-white rounded-tr-none'
                 }`}>
-                  <p className="text-sm leading-relaxed">{msg.content}</p>
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                 </div>
               </div>
             ))}

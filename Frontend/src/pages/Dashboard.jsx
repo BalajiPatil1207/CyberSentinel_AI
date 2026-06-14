@@ -158,8 +158,8 @@ export function Dashboard() {
               </thead>
               <tbody>
                 {threats.slice(0, 5).map((threat) => (
-                  <tr key={threat.id} className="border-b border-slate-800 hover:bg-slate-800/30 transition-colors">
-                    <td className="px-4 py-3 font-medium text-white">{threat.id}</td>
+                  <tr key={threat._id || threat.id} className="border-b border-slate-800 hover:bg-slate-800/30 transition-colors">
+                    <td className="px-4 py-3 font-medium text-white">{(threat._id || threat.id).substring(0, 8)}</td>
                     <td className="px-4 py-3 text-slate-300">{threat.type}</td>
                     <td className="px-4 py-3 font-mono text-slate-400">{threat.source}</td>
                     <td className="px-4 py-3">
@@ -171,7 +171,7 @@ export function Dashboard() {
                         {threat.severity}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-slate-400">{new Date(threat.timestamp).toLocaleTimeString()}</td>
+                    <td className="px-4 py-3 text-slate-400">{new Date(threat.timestamp || threat.createdAt).toLocaleTimeString()}</td>
                   </tr>
                 ))}
               </tbody>

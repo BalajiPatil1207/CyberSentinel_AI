@@ -1,61 +1,188 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { getInitialData, dummyThreats, dummyIncidents, dummyAlerts, dummyUsers, dummyVulnerabilities } from "../data/dummy";
+import { useAuth } from "./AuthContext";
 
 const DataContext = createContext();
 
 export const DataProvider = ({ children }) => {
+  const { user, getAuthHeaders } = useAuth();
   const [threats, setThreats] = useState([]);
   const [incidents, setIncidents] = useState([]);
   const [alerts, setAlerts] = useState([]);
   const [users, setUsers] = useState([]);
   const [vulnerabilities, setVulnerabilities] = useState([]);
 
+  // Fetch all initial data
+  const fetchData = async () => {
+    if (!user) return;
+
+    try {
+      // Fetch alerts (accessible to all logged-in roles)
+      const resAlerts = await fetch("/api/alerts", { headers: getAuthHeaders() });
+      if (resAlerts.ok) {
+        const data = await resAlerts.json();
+        setAlerts(data.data || []);
+      }
+
+      // Fetch threats (restricted to Super Admin and Security Analyst)
+      if (user.role === "Super Admin" || user.role === "Security Analyst") {
+        const resThreats = await fetch("/api/threats", { headers: getAuthHeaders() });
+        if (resThreats.ok) {
+          const data = await resThreats.json();
+          setThreats(data.data || []);
+        }
+
+        const resIncidents = await fetch("/api/incidents", { headers: getAuthHeaders() });
+        if (resIncidents.ok) {
+          const data = await resIncidents.json();
+          setIncidents(data.data || []);
+        }
+
+        const resVulns = await fetch("/api/security/vulnerabilities", { headers: getAuthHeaders() });
+        if (resVulns.ok) {
+          const data = await resVulns.json();
+          setVulnerabilities(data.data || []);
+        }
+      }
+
+      // Fetch users (restricted to Super Admin only)
+      if (user.role === "Super Admin") {
+        const resUsers = await fetch("/api/users", { headers: getAuthHeaders() });
+        if (resUsers.ok) {
+          const data = await resUsers.json();
+          setUsers(data.data || []);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching data from API:", error);
+    }
+  };
+
   useEffect(() => {
-    setThreats(getInitialData("cs_threats", dummyThreats));
-    setIncidents(getInitialData("cs_incidents", dummyIncidents));
-    setAlerts(getInitialData("cs_alerts", dummyAlerts));
-    setUsers(getInitialData("cs_users", dummyUsers));
-    setVulnerabilities(getInitialData("cs_vulnerabilities", dummyVulnerabilities));
-  }, []);
+    fetchData();
+  }, [user]);
 
-  // Helpers to update local storage and state
-  const addThreat = (threat) => {
-    const updated = [threat, ...threats];
-    setThreats(updated);
-    localStorage.setItem("cs_threats", JSON.stringify(updated));
+  // Operations
+  const addIncident = async (newIncident) => {
+    try {
+      const response = await fetch("/api/incidents", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeaders(),
+        },
+        body: JSON.stringify(newIncident),
+      });
+      if (response.ok) {
+        const result = await response.json();
+        setIncidents((prev) => [result.data, ...prev]);
+        return { success: true };
+      }
+      return { success: false, message: "Failed to create incident." };
+    } catch (error) {
+      console.error(error);
+      return { success: false, message: "Network error occurred." };
+    }
   };
 
-  const addIncident = (incident) => {
-    const updated = [incident, ...incidents];
-    setIncidents(updated);
-    localStorage.setItem("cs_incidents", JSON.stringify(updated));
+  const updateIncident = async (id, updates) => {
+    try {
+      const response = await fetch(`/api/incidents/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeaders(),
+        },
+        body: JSON.stringify(updates),
+      });
+      if (response.ok) {
+        const result = await response.json();
+        setIncidents((prev) =>
+          prev.map((i) => (i._id === id || i.id === id ? result.data : i))
+        );
+        return { success: true, data: result.data };
+      }
+      return { success: false };
+    } catch (error) {
+      console.error(error);
+      return { success: false };
+    }
   };
 
-  const updateIncident = (id, updates) => {
-    const updated = incidents.map(i => i.id === id ? { ...i, ...updates } : i);
-    setIncidents(updated);
-    localStorage.setItem("cs_incidents", JSON.stringify(updated));
+  const addIncidentNote = async (id, text) => {
+    try {
+      const response = await fetch(`/api/incidents/${id}/notes`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeaders(),
+        },
+        body: JSON.stringify({ text }),
+      });
+      if (response.ok) {
+        const result = await response.json();
+        setIncidents((prev) =>
+          prev.map((i) => (i._id === id || i.id === id ? result.data : i))
+        );
+        return { success: true, data: result.data };
+      }
+      return { success: false };
+    } catch (error) {
+      console.error(error);
+      return { success: false };
+    }
   };
 
-  const addAlert = (alert) => {
-    const updated = [alert, ...alerts];
-    setAlerts(updated);
-    localStorage.setItem("cs_alerts", JSON.stringify(updated));
+  const markAlertAsRead = async (id) => {
+    try {
+      const response = await fetch(`/api/alerts/${id}/read`, {
+        method: "PATCH",
+        headers: getAuthHeaders(),
+      });
+      if (response.ok) {
+        const result = await response.json();
+        setAlerts((prev) =>
+          prev.map((a) => (a._id === id ? result.data : a))
+        );
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const markAlertAsRead = (id) => {
-    const updated = alerts.map(a => a.id === id ? { ...a, isRead: true } : a);
-    setAlerts(updated);
-    localStorage.setItem("cs_alerts", JSON.stringify(updated));
+  const toggleUserStatus = async (id, currentStatus) => {
+    const nextStatus = currentStatus === "Active" ? "Inactive" : "Active";
+    try {
+      const response = await fetch(`/api/users/${id}/status`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeaders(),
+        },
+        body: JSON.stringify({ status: nextStatus }),
+      });
+      if (response.ok) {
+        const result = await response.json();
+        setUsers((prev) =>
+          prev.map((u) => (u._id === id ? result.data : u))
+        );
+        return { success: true };
+      }
+      const errRes = await response.json();
+      return { success: false, message: errRes.message };
+    } catch (error) {
+      console.error(error);
+      return { success: false, message: "Network error occurred." };
+    }
   };
 
   return (
     <DataContext.Provider value={{
-      threats, addThreat,
-      incidents, addIncident, updateIncident,
-      alerts, addAlert, markAlertAsRead,
-      users,
-      vulnerabilities
+      threats,
+      incidents, addIncident, updateIncident, addIncidentNote,
+      alerts, markAlertAsRead,
+      users, toggleUserStatus,
+      vulnerabilities,
+      fetchData
     }}>
       {children}
     </DataContext.Provider>

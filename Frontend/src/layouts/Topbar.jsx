@@ -2,10 +2,12 @@ import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Bell, UserCircle, Search } from 'lucide-react';
 import { useData } from '../context/DataContext';
+import { useNavigate } from 'react-router-dom';
 
 export function Topbar() {
   const { user } = useAuth();
   const { alerts } = useData();
+  const navigate = useNavigate();
   const unreadAlerts = alerts.filter(a => !a.isRead).length;
 
   return (
@@ -20,7 +22,10 @@ export function Topbar() {
       </div>
 
       <div className="flex items-center gap-6">
-        <button className="relative text-slate-400 hover:text-white transition-colors">
+        <button 
+          onClick={() => navigate('/alerts')}
+          className="relative text-slate-400 hover:text-white transition-colors"
+        >
           <Bell className="w-5 h-5" />
           {unreadAlerts > 0 && (
             <span className="absolute -top-1 -right-1 bg-brand-cyan text-slate-900 text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center">
