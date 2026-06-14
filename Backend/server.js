@@ -37,6 +37,7 @@ app.use("/api/incidents", incidentRoutes);
 app.use("/api/security", securityRoutes);
 app.use("/api/alerts", alertRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/reports", reportRoutes);
 
 // Root route (Health check)
 app.get("/", (req, res) => {
