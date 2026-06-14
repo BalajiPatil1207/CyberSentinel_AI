@@ -1,8 +1,8 @@
-const multer = require("multer");
-const fs = require("fs");
-const path = require("path");
-const sharp = require("sharp");
-const { PDFDocument } = require("pdf-lib");
+import multer from "multer";
+import fs from "fs";
+import path from "path";
+import sharp from "sharp";
+import { PDFDocument } from "pdf-lib";
 
 // ------------------------------
 // Nested setter
@@ -108,4 +108,5 @@ async function saveRAMFiles(tempFiles) {
     }
 }
 
-module.exports = { memoryUpload, saveRAMFiles };
+export { memoryUpload, saveRAMFiles };
+export default memoryUpload;
