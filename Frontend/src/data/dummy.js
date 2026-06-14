@@ -1,5 +1,5 @@
 export const dummyUsers = [
-  { id: 1, name: "Super Admin", email: "admin@abccybershield.com", role: "Super Admin", status: "Active" },
+  { id: 1, name: "Super Admin", email: "admin@patilcybershield.com", role: "Super Admin", status: "Active" },
   { id: 2, name: "Security Analyst", email: "analyst@abccybershield.com", role: "Security Analyst", status: "Active" },
   { id: 3, name: "Employee User", email: "employee@abccybershield.com", role: "Employee", status: "Active" },
 ];
