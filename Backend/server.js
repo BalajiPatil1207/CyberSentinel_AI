@@ -6,6 +6,9 @@ import connectDB from "./config/db.js";
 import errorHandler from "./middlewares/errorMiddleware.js";
 import ApiResponse, { sendSuccess, sendCreated, sendPaginated } from "./utils/apiResponse.js";
 import ApiError, { throwBadRequest, throwUnauthorized, throwForbidden, throwNotFound, throwInternal } from "./utils/ApiError.js";
+import authRoutes from "./routes/authRoutes.js";
+import threatRoutes from "./routes/threatRoutes.js";
+import incidentRoutes from "./routes/incidentRoutes.js";
 
 // Load environment variables
 dotenv.config();
@@ -20,6 +23,13 @@ app.use(express.urlencoded({ extended: true }));
 
 // Connect to Database
 connectDB();
+
+// Auth routes
+app.use("/api/auth", authRoutes);
+
+// Cybersecurity routes
+app.use("/api/threats", threatRoutes);
+app.use("/api/incidents", incidentRoutes);
 
 // Root route (Health check)
 app.get("/", (req, res) => {
