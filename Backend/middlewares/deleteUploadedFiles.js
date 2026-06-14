@@ -1,5 +1,5 @@
-const fs = require("fs");
-const path = require("path");
+import fs from "fs";
+import path from "path";
 
 // ✅ Safe delete function
 function safeUnlink(filePath) {
@@ -33,4 +33,5 @@ function deleteUploadedFiles(data) {
   }
 }
 
-module.exports = { deleteUploadedFiles };
+export { deleteUploadedFiles };
+export default deleteUploadedFiles;
