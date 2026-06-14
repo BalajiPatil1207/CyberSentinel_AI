@@ -2,29 +2,48 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/Card';
 import { Button } from '../components/Button';
 import { Mail, Link as LinkIcon, ShieldCheck, ShieldAlert, ChevronRight } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { useData } from '../context/DataContext';
 
 export function PhishingDetection() {
+  const { getAuthHeaders } = useAuth();
+  const { fetchData } = useData();
   const [content, setContent] = useState('');
   const [type, setType] = useState('email'); // email or url
   const [scanning, setScanning] = useState(false);
   const [result, setResult] = useState(null);
+  const [error, setError] = useState('');
 
-  const handleScan = () => {
-    if (!content) return;
+  const handleScan = async () => {
+    if (!content.trim()) return;
     setScanning(true);
-    // Simulate AI scan
-    setTimeout(() => {
-      setScanning(false);
-      setResult({
-        score: Math.floor(Math.random() * 40) + 60, // 60-100 score for dummy
-        isMalicious: Math.random() > 0.5,
-        details: [
-          "Suspicious sender domain mismatch",
-          "Urgent language detected ('Immediate action required')",
-          "Hidden URL redirects to unknown server"
-        ]
+    setResult(null);
+    setError('');
+
+    try {
+      const response = await fetch('/api/security/phishing-scan', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders()
+        },
+        body: JSON.stringify({ type, content })
       });
-    }, 2000);
+
+      const resData = await response.json();
+      if (response.ok && resData.success) {
+        setResult(resData.data);
+        // Refresh global dashboard data (incidents, threats, alerts lists) in background
+        fetchData();
+      } else {
+        setError(resData.message || 'Phishing analysis scan failed.');
+      }
+    } catch (err) {
+      console.error(err);
+      setError('Network error occurred during phishing scan.');
+    } finally {
+      setScanning(false);
+    }
   };
 
   return (
@@ -55,14 +74,20 @@ export function PhishingDetection() {
               </button>
             </div>
 
+            {error && (
+              <div className="p-3 text-xs bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg text-center font-semibold">
+                {error}
+              </div>
+            )}
+
             <textarea 
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder={type === 'email' ? "Paste email headers and content here..." : "https://suspicious-link.com"}
+              placeholder={type === 'email' ? "Paste email headers and content here..." : "e.g. secure-login-verify-account.com/reset-password"}
               className="w-full flex-1 min-h-[200px] glass-input resize-none p-4 font-mono text-sm"
             />
             
-            <Button variant="cyan" onClick={handleScan} disabled={scanning || !content}>
+            <Button variant="cyan" onClick={handleScan} disabled={scanning || !content.trim()}>
               {scanning ? 'Analyzing Content...' : 'Run Security Scan'}
             </Button>
           </CardContent>
@@ -96,32 +121,32 @@ export function PhishingDetection() {
                       <h3 className={`text-xl font-bold ${result.isMalicious ? 'text-red-400' : 'text-green-400'}`}>
                         {result.isMalicious ? 'High Risk Detected' : 'Safe Content'}
                       </h3>
-                      <p className="text-slate-300 mt-1">AI Threat Score: {result.score}/100</p>
+                      <p className="text-slate-350 font-medium mt-1">AI Threat Score: {result.score}/100</p>
                     </div>
                   </div>
                 </div>
 
-                {result.isMalicious && (
-                  <div className="space-y-4">
-                    <h4 className="text-lg font-semibold text-white">Analysis Breakdown</h4>
-                    <ul className="space-y-3">
-                      {result.details.map((detail, idx) => (
-                        <li key={idx} className="flex items-start gap-3 bg-slate-900/50 p-3 rounded-lg border border-slate-800">
-                          <ChevronRight className="w-5 h-5 text-brand-cyan shrink-0" />
-                          <span className="text-slate-300 text-sm">{detail}</span>
-                        </li>
-                      ))}
-                    </ul>
+                <div className="space-y-4">
+                  <h4 className="text-lg font-semibold text-white">Analysis Breakdown</h4>
+                  <ul className="space-y-3">
+                    {result.details.map((detail, idx) => (
+                      <li key={idx} className="flex items-start gap-3 bg-slate-900/50 p-3 rounded-lg border border-slate-800">
+                        <ChevronRight className="w-5 h-5 text-brand-cyan shrink-0 animate-pulse" />
+                        <span className="text-slate-350 text-sm">{detail}</span>
+                      </li>
+                    ))}
+                  </ul>
 
+                  {result.isMalicious && (
                     <div className="pt-4 border-t border-slate-800">
                       <h4 className="text-sm font-medium text-slate-400 mb-3">Recommended Actions</h4>
                       <div className="flex gap-3">
-                        <Button variant="outline" className="text-red-400 border-red-900 hover:bg-red-900/20">Block Sender</Button>
-                        <Button variant="primary">Create Incident Ticket</Button>
+                        <Button variant="outline" className="text-red-450 border-red-900/50 hover:bg-red-900/25">Block Indicator</Button>
+                        <Button variant="primary" onClick={() => window.location.href = '/incident-response'}>Create Incident Ticket</Button>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             )}
           </CardContent>
