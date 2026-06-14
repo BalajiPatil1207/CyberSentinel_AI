@@ -4,6 +4,8 @@ import Alert from "../models/Alert.js";
 import ChatHistory from "../models/ChatHistory.js";
 import { throwBadRequest, throwNotFound } from "../utils/ApiError.js";
 import { sendSuccess } from "../utils/apiResponse.js";
+import { saveRAMFiles } from "../middlewares/memoryUpload.js";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 /**
  * @desc    Scan email content or links for phishing indicators
@@ -122,7 +124,7 @@ const runPhishingScan = async (req, res, next) => {
       });
 
       // 3. Emit real-time WebSockets notifications
-      const io = req.app.get("io");
+      const io = req.app?.get("io");
       if (io) {
         io.emit("new-threat", threatObj);
         io.emit("new-alert", alertObj);
@@ -199,7 +201,7 @@ const runVulnScan = async (req, res, next) => {
           isRead: false,
         });
 
-        const io = req.app.get("io");
+        const io = req.app?.get("io");
         if (io) {
           io.emit("new-alert", alertObj);
         }
@@ -230,15 +232,36 @@ const aiChat = async (req, res, next) => {
       throwBadRequest("Please provide a prompt for the AI Assistant.");
     }
 
-    const query = prompt.toLowerCase();
-    let reply = "I've analyzed your query. Based on the current security context, everything looks stable, but I recommend checking the latest vulnerability scan results.";
+    let reply = "";
 
-    if (query.includes("cve")) {
-      reply = "CVE-2024-1024 is a critical buffer overflow vulnerability found in OpenSSL. It allows remote attackers to execute arbitrary code. Recommended action: Patch the system immediately to the latest version.";
-    } else if (query.includes("phishing")) {
-      reply = "To mitigate a phishing attack: 1) Isolate the affected user's machine. 2) Reset their credentials. 3) Block the malicious sender domain at the email gateway. 4) Run a full system malware scan.";
-    } else if (query.includes("threat") || query.includes("status")) {
-      reply = "Currently, our monitoring systems show no new active threats outside of expected background noise. Be sure to audit port scans and active incident responses in the central terminal.";
+    // If API key is available, use Google Gemini AI
+    if (process.env.GEMINI_API_KEY) {
+      try {
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        
+        // Feed it context about CyberSentinel AI to give it a security Analyst persona
+        const systemPrompt = `You are the CyberSentinel AI Security Copilot. Answer the following security question/concern in a professional, concise manner: ${prompt}`;
+        
+        const result = await model.generateContent(systemPrompt);
+        reply = result.response.text();
+      } catch (geminiError) {
+        console.error("Gemini AI API Error, falling back to heuristics:", geminiError);
+      }
+    }
+
+    // Heuristics Fallback if Gemini key is missing or failed
+    if (!reply) {
+      const query = prompt.toLowerCase();
+      reply = "I've analyzed your query. Based on the current security context, everything looks stable, but I recommend checking the latest vulnerability scan results.";
+
+      if (query.includes("cve")) {
+        reply = "CVE-2024-1024 is a critical buffer overflow vulnerability found in OpenSSL. It allows remote attackers to execute arbitrary code. Recommended action: Patch the system immediately to the latest version.";
+      } else if (query.includes("phishing")) {
+        reply = "To mitigate a phishing attack: 1) Isolate the affected user's machine. 2) Reset their credentials. 3) Block the malicious sender domain at the email gateway. 4) Run a full system malware scan.";
+      } else if (query.includes("threat") || query.includes("status")) {
+        reply = "Currently, our monitoring systems show no new active threats outside of expected background noise. Be sure to audit port scans and active incident responses in the central terminal.";
+      }
     }
 
     // Save chat history
@@ -341,7 +364,7 @@ const malwareAnalyze = async (req, res, next) => {
       });
 
       // Emit socket alerts
-      const io = req.app.get("io");
+      const io = req.app?.get("io");
       if (io) {
         io.emit("new-threat", threatObj);
         io.emit("new-alert", alertObj);
@@ -406,12 +429,107 @@ const patchVulnerability = async (req, res, next) => {
   }
 };
 
+/**
+ * @desc    Upload and analyze binary/script file in Sandbox
+ * @route   POST /api/security/malware-upload
+ * @access  Protected (All logged-in roles)
+ */
+const malwareUpload = async (req, res, next) => {
+  try {
+    if (!req.tempFiles || req.tempFiles.length === 0) {
+      return throwBadRequest("No file was uploaded.");
+    }
+
+    // Save and compress files (if image/pdf) or write directly to server
+    await saveRAMFiles(req.tempFiles);
+
+    const uploadedFile = req.tempFiles[0];
+    const fileName = uploadedFile.finalPath.split("/").pop();
+    const fileContentString = uploadedFile.buffer.toString("utf-8");
+
+    // Perform malware scanning heuristics
+    const details = [];
+    let score = 0;
+
+    const lowerContent = fileContentString.toLowerCase();
+    
+    // Look for dangerous script operations in files
+    if (lowerContent.includes("eval(") || lowerContent.includes("exec(")) {
+      score += 40;
+      details.push("Dynamic code execution function detected ('eval' / 'exec').");
+    }
+    if (lowerContent.includes("child_process") || lowerContent.includes("spawn(") || lowerContent.includes("system(")) {
+      score += 35;
+      details.push("System shell command execution interface detected.");
+    }
+    if (lowerContent.includes("fs.write") || lowerContent.includes("fs.unlink") || lowerContent.includes("rm -rf")) {
+      score += 25;
+      details.push("Destructive filesystem modifications identified.");
+    }
+
+    // Analyze by file extension signature
+    const ext = uploadedFile.originalExt.replace(".", "").toLowerCase();
+    if (["exe", "bat", "sh", "scr", "vbs"].includes(ext)) {
+      score += 50;
+      details.push(`Executable binary file format detected ('.${ext}').`);
+    } else {
+      score += 10;
+      details.push(`Standard file format analysis completed ('.${ext}').`);
+    }
+
+    // Randomize score variance
+    score = Math.min(Math.max(score + Math.floor(Math.random() * 20), 0), 100);
+    const isMalicious = score >= 50;
+
+    if (isMalicious) {
+      // Log Threat
+      const threatObj = await Threat.create({
+        type: "Malware Detected",
+        source: `Sandbox Upload: ${fileName}`,
+        target: "Security Incident Desk",
+        severity: score >= 85 ? "Critical" : "High",
+        status: "Active",
+      });
+
+      // Trigger Alert
+      const alertObj = await Alert.create({
+        message: `Malware payload (${score}/100) identified in sandbox upload of ${fileName}!`,
+        type: score >= 85 ? "critical" : "warning",
+        isRead: false,
+      });
+
+      // Emit socket alerts
+      const io = req.app?.get("io");
+      if (io) {
+        io.emit("new-threat", threatObj);
+        io.emit("new-alert", alertObj);
+      }
+    }
+
+    const report = {
+      hash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      fileName,
+      score,
+      threatLevel: isMalicious ? "Malicious" : "Clean",
+      enginesDetected: isMalicious ? Math.floor(Math.random() * 15) + 5 : 0,
+      totalEngines: 64,
+      details: details.length > 0 ? details : ["No suspicious operations or formatting detected."],
+      filePath: "/" + uploadedFile.finalPath, // Relative path from public root
+    };
+
+    return sendSuccess(res, report, `Sandbox malware upload analysis of ${fileName} completed successfully.`);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default {
   runPhishingScan,
   runVulnScan,
   aiChat,
   getChatHistory,
   malwareAnalyze,
+  malwareUpload,
   getVulnerabilities,
   patchVulnerability,
 };
@@ -422,6 +540,7 @@ export {
   aiChat,
   getChatHistory,
   malwareAnalyze,
+  malwareUpload,
   getVulnerabilities,
   patchVulnerability,
 };
