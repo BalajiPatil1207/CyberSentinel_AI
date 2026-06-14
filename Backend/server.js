@@ -12,6 +12,7 @@ import incidentRoutes from "./routes/incidentRoutes.js";
 import securityRoutes from "./routes/securityRoutes.js";
 import alertRoutes from "./routes/alertRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import reportRoutes from "./routes/reportRoutes.js";
 
 // Load environment variables
 dotenv.config();
