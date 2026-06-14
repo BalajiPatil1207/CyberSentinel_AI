@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { dummyUsers } from "../data/dummy";
 
 const AuthContext = createContext();
 
@@ -7,63 +6,120 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem("auth_user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setLoading(false);
-  }, []);
-
-  const login = (email, password) => {
-    // Read from registered local storage list, fallback to default dummy users list
-    const storedUsers = JSON.parse(localStorage.getItem("cs_users")) || dummyUsers;
-    const foundUser = storedUsers.find((u) => u.email === email);
-
-    if (foundUser) {
-      // If it's the Super Admin, enforce the required password
-      if (email === "admin@patilcybershield.com" && password !== "P@tilcybershild1207") {
-        return { success: false, message: "Invalid credentials. Please enter the correct password." };
-      }
-      setUser(foundUser);
-      localStorage.setItem("auth_user", JSON.stringify(foundUser));
-      return { success: true };
-    }
-    return { success: false, message: "Invalid credentials" };
+  // Helper to get auth headers with JWT token
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem("auth_token");
+    return token ? { "Authorization": `Bearer ${token}` } : {};
   };
 
-  const register = (name, email, password, role = "Employee") => {
-    const storedUsers = JSON.parse(localStorage.getItem("cs_users")) || dummyUsers;
-    const userExists = storedUsers.find((u) => u.email === email);
+  useEffect(() => {
+    const checkAuth = async () => {
+      const token = localStorage.getItem("auth_token");
+      const storedUser = localStorage.getItem("auth_user");
 
-    if (userExists) {
-      return { success: false, message: "User already exists with this email address." };
-    }
+      if (token && storedUser) {
+        try {
+          // Verify token against backend /api/auth/me
+          const response = await fetch("/api/auth/me", {
+            headers: {
+              ...getAuthHeaders(),
+            },
+          });
 
-    const newUser = {
-      id: Date.now().toString(),
-      name,
-      email,
-      role,
-      status: "Active"
+          if (response.ok) {
+            const result = await response.json();
+            setUser(result.data);
+            localStorage.setItem("auth_user", JSON.stringify(result.data));
+          } else {
+            // Token expired or invalid
+            logout();
+          }
+        } catch (error) {
+          console.error("Auth check failed:", error);
+          // Network error: Fallback to stored user so page still renders offline if needed
+          setUser(JSON.parse(storedUser));
+        }
+      }
+      setLoading(false);
     };
 
-    const updatedUsers = [...storedUsers, newUser];
-    localStorage.setItem("cs_users", JSON.stringify(updatedUsers));
+    checkAuth();
+  }, []);
 
-    // Sign active session
-    setUser(newUser);
-    localStorage.setItem("auth_user", JSON.stringify(newUser));
-    return { success: true };
+  const login = async (email, password) => {
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        const { user: loggedInUser, token } = result.data;
+        setUser(loggedInUser);
+        localStorage.setItem("auth_token", token);
+        localStorage.setItem("auth_user", JSON.stringify(loggedInUser));
+        return { success: true };
+      } else {
+        return { 
+          success: false, 
+          message: result.message || "Invalid email or password credentials." 
+        };
+      }
+    } catch (error) {
+      console.error("Login API request failed:", error);
+      return { 
+        success: false, 
+        message: "Network error. Unable to connect to authorization server." 
+      };
+    }
+  };
+
+  const register = async (name, email, password, role = "Employee") => {
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, email, password, role }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        const { user: registeredUser, token } = result.data;
+        setUser(registeredUser);
+        localStorage.setItem("auth_token", token);
+        localStorage.setItem("auth_user", JSON.stringify(registeredUser));
+        return { success: true };
+      } else {
+        return { 
+          success: false, 
+          message: result.message || "Registration failed. Please check inputs." 
+        };
+      }
+    } catch (error) {
+      console.error("Registration API request failed:", error);
+      return { 
+        success: false, 
+        message: "Network error. Unable to connect to authorization server." 
+      };
+    }
   };
 
   const logout = () => {
     setUser(null);
+    localStorage.removeItem("auth_token");
     localStorage.removeItem("auth_user");
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, register, logout, loading, getAuthHeaders }}>
       {!loading && children}
     </AuthContext.Provider>
   );
