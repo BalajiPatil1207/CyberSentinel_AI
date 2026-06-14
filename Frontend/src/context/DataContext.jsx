@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "./AuthContext";
+import { io } from "socket.io-client";
 
 const DataContext = createContext();
 
@@ -59,6 +60,42 @@ export const DataProvider = ({ children }) => {
 
   useEffect(() => {
     fetchData();
+
+    if (!user) return;
+
+    // Connect to server socket
+    const socket = io(window.location.origin, {
+      transports: ["websocket"],
+      autoConnect: true,
+    });
+
+    socket.on("connect", () => {
+      console.log("[Socket.io] Connected to server feed.");
+    });
+
+    socket.on("new-threat", (newThreat) => {
+      console.log("[Socket.io] Dynamic threat received:", newThreat);
+      setThreats((prev) => {
+        if (prev.some((t) => t._id === newThreat._id)) return prev;
+        return [newThreat, ...prev];
+      });
+    });
+
+    socket.on("new-alert", (newAlert) => {
+      console.log("[Socket.io] Dynamic alert received:", newAlert);
+      setAlerts((prev) => {
+        if (prev.some((a) => a._id === newAlert._id)) return prev;
+        return [newAlert, ...prev];
+      });
+    });
+
+    socket.on("disconnect", () => {
+      console.log("[Socket.io] Disconnected from server feed.");
+    });
+
+    return () => {
+      socket.disconnect();
+    };
   }, [user]);
 
   // Operations
