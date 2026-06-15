@@ -1,5 +1,5 @@
 import express from "express";
-import { getUsers, updateUserStatus } from "../controllers/authController.js";
+import { getUsers, updateUserStatus, deleteUser } from "../controllers/authController.js";
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
@@ -10,5 +10,6 @@ router.use(authorizeRoles("Super Admin"));
 
 router.route("/").get(getUsers);
 router.route("/:id/status").put(updateUserStatus);
+router.route("/:id").delete(deleteUser);
 
 export default router;
