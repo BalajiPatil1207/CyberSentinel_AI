@@ -180,12 +180,40 @@ const updateUserStatus = async (req, res, next) => {
   }
 };
 
+/**
+ * @desc    Delete a user
+ * @route   DELETE /api/users/:id
+ * @access  Protected (Super Admin only)
+ */
+const deleteUser = async (req, res, next) => {
+  const { id } = req.params;
+
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      throwNotFound(`User with ID ${id} not found.`);
+    }
+
+    // Do not allow deleting the main super admin account
+    if (user.email === "admin@patilcybershield.com") {
+      throwBadRequest("The primary Super Admin user account cannot be deleted.");
+    }
+
+    await User.findByIdAndDelete(id);
+
+    return sendSuccess(res, null, "User deleted successfully!");
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default {
   register,
   login,
   getMe,
   getUsers,
   updateUserStatus,
+  deleteUser,
 };
 
 export {
@@ -194,4 +222,5 @@ export {
   getMe,
   getUsers,
   updateUserStatus,
+  deleteUser,
 };
