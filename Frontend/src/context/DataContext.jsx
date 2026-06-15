@@ -212,12 +212,30 @@ export const DataProvider = ({ children }) => {
     }
   };
 
+  const deleteUser = async (id) => {
+    try {
+      const response = await fetch(`/api/users/${id}`, {
+        method: "DELETE",
+        headers: getAuthHeaders(),
+      });
+      if (response.ok) {
+        setUsers((prev) => prev.filter((u) => u._id !== id && u.id !== id));
+        return { success: true };
+      }
+      const errRes = await response.json();
+      return { success: false, message: errRes.message };
+    } catch (error) {
+      console.error(error);
+      return { success: false, message: "Network error occurred." };
+    }
+  };
+
   return (
     <DataContext.Provider value={{
       threats,
       incidents, addIncident, updateIncident, addIncidentNote,
       alerts, markAlertAsRead,
-      users, toggleUserStatus,
+      users, toggleUserStatus, deleteUser,
       vulnerabilities,
       fetchData
     }}>
