@@ -40,21 +40,20 @@ function DashboardRedirect() {
 }
 
 // Role-Based Route Gate Component
-function RoleProtectedRoute({ children, allowedRoles }) {
+function RoleProtectedRoute({ children, allowedRoles, permissionId }) {
   const { user } = useAuth();
 
   if (!user) {
     return <Navigate to="/login" replace />;
   }
 
-  // If allowedPermissions array is passed, check it first
-  if (allowedRoles && allowedRoles.length > 0) {
-    // If the user has explicitly defined permissions, check those
-    if (user.permissions && user.permissions.length > 0) {
-      // Find the specific route path from window location or pass an identifier
-      // Actually we need the route ID. For simplicity, since the route is protected by RoleProtectedRoute,
-      // we can add an optional `permissionId` prop to RoleProtectedRoute.
-      // But we haven't added `permissionId` to the route components yet. Let's do that.
+  // If the user has specific module permissions defined, they override the role
+  if (user.permissions && user.permissions.length > 0) {
+    if (permissionId && user.permissions.includes(permissionId)) {
+      return children;
+    } else {
+      const defaultPath = `/${user.permissions[0]}`;
+      return <Navigate to={defaultPath} replace />;
     }
   }
 
@@ -97,67 +96,67 @@ function App() {
               <Route path="/app" element={<DashboardRedirect />} />
               
               <Route path="/dashboard" element={
-                <RoleProtectedRoute allowedRoles={['Super Admin', 'Security Analyst']}>
+                <RoleProtectedRoute allowedRoles={['Super Admin', 'Security Analyst']} permissionId="dashboard">
                   <Dashboard />
                 </RoleProtectedRoute>
               } />
               
               <Route path="threat-monitoring" element={
-                <RoleProtectedRoute allowedRoles={['Super Admin', 'Security Analyst']}>
+                <RoleProtectedRoute allowedRoles={['Super Admin', 'Security Analyst']} permissionId="threat-monitoring">
                   <ThreatMonitoring />
                 </RoleProtectedRoute>
               } />
               
               <Route path="phishing-detection" element={
-                <RoleProtectedRoute allowedRoles={['Super Admin', 'Security Analyst', 'Employee']}>
+                <RoleProtectedRoute allowedRoles={['Super Admin', 'Security Analyst', 'Employee']} permissionId="phishing-detection">
                   <PhishingDetection />
                 </RoleProtectedRoute>
               } />
               
               <Route path="malware-analysis" element={
-                <RoleProtectedRoute allowedRoles={['Super Admin', 'Security Analyst']}>
+                <RoleProtectedRoute allowedRoles={['Super Admin', 'Security Analyst']} permissionId="malware-analysis">
                   <MalwareAnalysis />
                 </RoleProtectedRoute>
               } />
               
               <Route path="vulnerability-scanner" element={
-                <RoleProtectedRoute allowedRoles={['Super Admin', 'Security Analyst']}>
+                <RoleProtectedRoute allowedRoles={['Super Admin', 'Security Analyst']} permissionId="vulnerability-scanner">
                   <VulnerabilityScanner />
                 </RoleProtectedRoute>
               } />
               
               <Route path="incident-response" element={
-                <RoleProtectedRoute allowedRoles={['Super Admin', 'Security Analyst']}>
+                <RoleProtectedRoute allowedRoles={['Super Admin', 'Security Analyst']} permissionId="incident-response">
                   <IncidentResponse />
                 </RoleProtectedRoute>
               } />
               
               <Route path="ai-assistant" element={
-                <RoleProtectedRoute allowedRoles={['Super Admin', 'Security Analyst', 'Employee']}>
+                <RoleProtectedRoute allowedRoles={['Super Admin', 'Security Analyst', 'Employee']} permissionId="ai-assistant">
                   <AIAssistant />
                 </RoleProtectedRoute>
               } />
               
               <Route path="alerts" element={
-                <RoleProtectedRoute allowedRoles={['Super Admin', 'Security Analyst', 'Employee']}>
+                <RoleProtectedRoute allowedRoles={['Super Admin', 'Security Analyst', 'Employee']} permissionId="alerts">
                   <Alerts />
                 </RoleProtectedRoute>
               } />
               
               <Route path="reports" element={
-                <RoleProtectedRoute allowedRoles={['Super Admin', 'Security Analyst']}>
+                <RoleProtectedRoute allowedRoles={['Super Admin', 'Security Analyst']} permissionId="reports">
                   <Reports />
                 </RoleProtectedRoute>
               } />
               
               <Route path="users" element={
-                <RoleProtectedRoute allowedRoles={['Super Admin']}>
+                <RoleProtectedRoute allowedRoles={['Super Admin']} permissionId="users">
                   <UserManagement />
                 </RoleProtectedRoute>
               } />
               
               <Route path="settings" element={
-                <RoleProtectedRoute allowedRoles={['Super Admin', 'Security Analyst', 'Employee']}>
+                <RoleProtectedRoute allowedRoles={['Super Admin', 'Security Analyst', 'Employee']} permissionId="settings">
                   <Settings />
                 </RoleProtectedRoute>
               } />
