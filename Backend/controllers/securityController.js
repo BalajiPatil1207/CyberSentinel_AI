@@ -238,7 +238,7 @@ const aiChat = async (req, res, next) => {
     if (process.env.GEMINI_API_KEY) {
       try {
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
         
         // Feed it context about CyberSentinel AI to give it a security Analyst persona
         const systemPrompt = `You are the CyberSentinel AI Security Copilot. Answer the following security question/concern in a professional, concise manner: ${prompt}`;
