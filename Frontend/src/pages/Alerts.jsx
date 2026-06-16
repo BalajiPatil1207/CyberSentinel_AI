@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
+import { Pagination } from '../components/Pagination';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/Card';
 import { Badge } from '../components/Badge';
 import { Button } from '../components/Button';
@@ -7,6 +8,11 @@ import { Bell, Check, AlertTriangle, Info } from 'lucide-react';
 
 export function Alerts() {
   const { alerts, markAlertAsRead } = useData();
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 30;
+  const totalPages = Math.ceil(alerts.length / ITEMS_PER_PAGE);
+  const paginatedAlerts = alerts.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   return (
     <div className="space-y-6">
@@ -30,7 +36,7 @@ export function Alerts() {
                 <p>No alerts at this time.</p>
               </div>
             ) : (
-              alerts.map((alert) => (
+              paginatedAlerts.map((alert) => (
                 <div 
                   key={alert._id || alert.id} 
                   className={`p-4 rounded-xl border flex items-start justify-between ${
@@ -69,6 +75,13 @@ export function Alerts() {
                 </div>
               ))
             )}
+          </div>
+          <div className="mt-4">
+            <Pagination 
+              currentPage={currentPage} 
+              totalPages={totalPages} 
+              onPageChange={setCurrentPage} 
+            />
           </div>
         </CardContent>
       </Card>
