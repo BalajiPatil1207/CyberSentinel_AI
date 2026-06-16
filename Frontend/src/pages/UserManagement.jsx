@@ -295,7 +295,6 @@ export function UserManagement() {
                     </select>
                   </div>
                 </div>
-                </div>
               </div>
 
               {/* Permissions Section (Add Form) */}
