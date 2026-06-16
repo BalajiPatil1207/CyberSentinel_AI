@@ -99,12 +99,12 @@ export function IncidentResponse() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white">Incident Response Center</h1>
           <p className="text-slate-400 text-sm mt-1">Manage and track security incidents.</p>
         </div>
-        <Button variant="cyan" onClick={() => setShowCreateForm(true)}>
+        <Button variant="cyan" onClick={() => setShowCreateForm(true)} className="w-full sm:w-auto">
           <Plus className="w-4 h-4 mr-2" />
           Create Incident
         </Button>
