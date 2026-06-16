@@ -112,7 +112,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const updateProfile = async (name, email) => {
+  const updateProfile = async (name, email, profilePicture) => {
     try {
       const response = await fetch("/api/auth/profile", {
         method: "PUT",
@@ -120,7 +120,7 @@ export const AuthProvider = ({ children }) => {
           "Content-Type": "application/json",
           ...getAuthHeaders(),
         },
-        body: JSON.stringify({ name, email }),
+        body: JSON.stringify({ name, email, profilePicture }),
       });
 
       const result = await response.json();
