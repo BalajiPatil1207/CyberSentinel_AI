@@ -388,6 +388,11 @@ export function UserManagement() {
               <CardTitle>Edit User</CardTitle>
             </CardHeader>
             <CardContent>
+              {error && (
+                <div className="p-3 mb-4 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center">
+                  {error}
+                </div>
+              )}
               <form onSubmit={handleEditSubmit} className="space-y-4">
                 <div className="space-y-1">
                   <label className="text-xs font-medium text-slate-400 ml-1">Full Name</label>
