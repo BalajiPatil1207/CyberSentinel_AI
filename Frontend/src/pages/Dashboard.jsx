@@ -178,9 +178,9 @@ export function Dashboard() {
           <CardTitle>Recent Active Threats</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left">
-              <thead className="text-xs text-slate-400 uppercase bg-slate-800/50">
+          <div className="overflow-x-hidden md:overflow-x-auto">
+            <table className="w-full text-sm text-left block md:table">
+              <thead className="hidden md:table-header-group text-xs text-slate-400 uppercase bg-slate-800/50">
                 <tr>
                   <th className="px-4 py-3 rounded-tl-lg">Sr. No.</th>
                   <th className="px-4 py-3">Threat ID</th>
@@ -190,14 +190,27 @@ export function Dashboard() {
                   <th className="px-4 py-3 rounded-tr-lg">Time</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="block md:table-row-group">
                 {threats.slice(0, 5).map((threat, index) => (
-                  <tr key={threat._id || threat.id} className="border-b border-slate-800 hover:bg-slate-800/30 transition-colors">
-                    <td className="px-4 py-3 text-slate-400">{index + 1}</td>
-                    <td className="px-4 py-3 font-medium text-white">{(threat._id || threat.id).substring(0, 8)}</td>
-                    <td className="px-4 py-3 text-slate-300">{threat.type}</td>
-                    <td className="px-4 py-3 font-mono text-slate-400">{threat.source}</td>
-                    <td className="px-4 py-3">
+                  <tr key={threat._id || threat.id} className="block md:table-row border border-slate-700 md:border-0 md:border-b border-slate-800 hover:bg-slate-800/30 bg-slate-900/50 md:bg-transparent rounded-xl mb-4 md:mb-0 p-4 md:p-0 transition-colors">
+                    <td className="flex justify-between items-center md:table-cell px-2 md:px-4 py-2 md:py-3 text-slate-400 border-b border-slate-800 md:border-0">
+                      <span className="md:hidden text-xs uppercase font-bold text-slate-500">Sr. No.</span>
+                      <span className="text-center md:text-left w-full md:w-auto">{index + 1}</span>
+                    </td>
+                    <td className="flex justify-between items-center md:table-cell px-2 md:px-4 py-2 md:py-3 font-medium text-white border-b border-slate-800 md:border-0">
+                      <span className="md:hidden text-xs uppercase font-bold text-slate-500">Threat ID</span>
+                      {(threat._id || threat.id).substring(0, 8)}
+                    </td>
+                    <td className="flex justify-between items-center md:table-cell px-2 md:px-4 py-2 md:py-3 text-slate-300 border-b border-slate-800 md:border-0">
+                      <span className="md:hidden text-xs uppercase font-bold text-slate-500">Type</span>
+                      {threat.type}
+                    </td>
+                    <td className="flex justify-between items-center md:table-cell px-2 md:px-4 py-2 md:py-3 font-mono text-slate-400 border-b border-slate-800 md:border-0">
+                      <span className="md:hidden text-xs uppercase font-bold text-slate-500">Source</span>
+                      {threat.source}
+                    </td>
+                    <td className="flex justify-between items-center md:table-cell px-2 md:px-4 py-2 md:py-3 border-b border-slate-800 md:border-0">
+                      <span className="md:hidden text-xs uppercase font-bold text-slate-500">Severity</span>
                       <span className={`px-2 py-1 rounded text-xs font-semibold ${
                         threat.severity === 'Critical' ? 'bg-red-500/10 text-red-400 border border-red-500/20' :
                         threat.severity === 'High' ? 'bg-orange-500/10 text-orange-400 border border-orange-500/20' :
@@ -206,7 +219,10 @@ export function Dashboard() {
                         {threat.severity}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-slate-400">{new Date(threat.timestamp || threat.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</td>
+                    <td className="flex justify-between items-center md:table-cell px-2 md:px-4 py-2 md:py-3 text-slate-400">
+                      <span className="md:hidden text-xs uppercase font-bold text-slate-500">Time</span>
+                      {new Date(threat.timestamp || threat.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
+                    </td>
                   </tr>
                 ))}
               </tbody>
