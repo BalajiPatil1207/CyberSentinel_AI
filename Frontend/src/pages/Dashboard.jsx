@@ -171,7 +171,7 @@ export function Dashboard() {
                         {threat.severity}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-slate-400">{new Date(threat.timestamp || threat.createdAt).toLocaleTimeString()}</td>
+                    <td className="px-4 py-3 text-slate-400">{new Date(threat.timestamp || threat.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</td>
                   </tr>
                 ))}
               </tbody>
