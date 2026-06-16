@@ -71,10 +71,10 @@ export function ThreatMonitoring() {
             {paginatedThreats.map((threat) => (
               <div 
                 key={threat._id || threat.id} 
-                className="flex items-center justify-between p-4 rounded-xl border border-slate-800 bg-slate-900/30 hover:bg-slate-800/50 transition-colors cursor-pointer"
+                className="flex flex-col md:flex-row md:items-center justify-between p-4 rounded-xl border border-slate-800 bg-slate-900/30 hover:bg-slate-800/50 transition-colors cursor-pointer gap-4"
                 onClick={() => setSelectedThreat(threat)}
               >
-                <div className="flex items-center gap-4">
+                <div className="flex items-start md:items-center gap-4">
                   <div className={`p-3 rounded-lg ${
                     threat.severity === 'Critical' ? 'bg-red-500/10 text-red-400' :
                     threat.severity === 'High' ? 'bg-orange-500/10 text-orange-400' :
@@ -83,7 +83,7 @@ export function ThreatMonitoring() {
                     <ShieldAlert className="w-6 h-6" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-white flex items-center gap-2">
+                    <h4 className="font-semibold text-white flex flex-wrap items-center gap-2">
                       {threat.type} 
                       <Badge variant={
                         threat.severity === 'Critical' ? 'destructive' :
@@ -92,16 +92,18 @@ export function ThreatMonitoring() {
                         {threat.severity}
                       </Badge>
                     </h4>
-                    <div className="text-sm text-slate-400 mt-1 flex gap-4">
+                    <div className="text-sm text-slate-400 mt-1 flex flex-col sm:flex-row sm:gap-4">
                       <span>ID: {(threat._id || threat.id).substring(0, 8)}</span>
-                      <span>Source: {threat.source}</span>
-                      <span>Target: {threat.target}</span>
+                      <span className="hidden sm:inline">•</span>
+                      <span className="truncate">Source: {threat.source}</span>
+                      <span className="hidden sm:inline">•</span>
+                      <span className="truncate">Target: {threat.target}</span>
                     </div>
                   </div>
                 </div>
-                <div className="text-right">
-                  <span className="text-sm text-slate-400">{new Date(threat.timestamp || threat.createdAt).toLocaleString([], { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })}</span>
-                  <div className="mt-2">
+                <div className="text-left md:text-right mt-2 md:mt-0 pl-16 md:pl-0 flex flex-row md:flex-col justify-between items-center md:items-end">
+                  <span className="text-xs text-slate-400">{new Date(threat.timestamp || threat.createdAt).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })}</span>
+                  <div className="mt-0 md:mt-2">
                     <Badge variant={threat.status === 'Active' ? 'destructive' : 'success'}>
                       {threat.status}
                     </Badge>
