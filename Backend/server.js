@@ -23,6 +23,12 @@ import alertRoutes from "./routes/alertRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
+import settingRoutes from "./routes/settingRoutes.js";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Load environment variables
 dotenv.config();
@@ -49,7 +55,7 @@ io.on("connection", (socket) => {
 });
 
 // Secure headers via Helmet
-app.use(helmet());
+app.use(helmet({ crossOriginResourcePolicy: false }));
 
 // Rate Limiting to prevent brute-force attacks
 const apiLimiter = rateLimit({
@@ -73,6 +79,9 @@ app.use(express.urlencoded({ extended: true }));
 // Connect to Database
 connectDB();
 
+// Serve uploads statically
+app.use("/uploads", express.static(path.join(__dirname, "upload")));
+
 // Auth routes
 app.use("/api/auth", authRoutes);
 
@@ -84,6 +93,7 @@ app.use("/api/alerts", alertRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/settings", settingRoutes);
 
 // Root route (Health check)
 app.get("/", (req, res) => {
