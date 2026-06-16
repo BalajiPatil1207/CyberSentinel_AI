@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/Card';
 import { Button } from '../components/Button';
 import { Badge } from '../components/Badge';
 import { Input } from '../components/Input';
+import { Pagination } from '../components/Pagination';
 import { UserPlus, ShieldCheck, Mail, Lock, User as UserIcon, Eye, Edit2, Trash2, CheckCircle, XCircle, AlertTriangle, Phone } from 'lucide-react';
 
 export function UserManagement() {
@@ -24,6 +25,12 @@ export function UserManagement() {
   const [mobile, setMobile] = useState('');
   const [permissions, setPermissions] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 30;
+  const totalPages = Math.ceil(users.length / ITEMS_PER_PAGE);
+  const paginatedUsers = users.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   const availableModules = [
     { id: 'dashboard', label: 'Dashboard' },
@@ -343,10 +350,10 @@ export function UserManagement() {
                 </tr>
               </thead>
               <tbody>
-                {users.map((user, index) => (
+                {paginatedUsers.map((user, index) => (
                   <tr key={user._id || user.id} className="border-b border-slate-800 hover:bg-slate-800/30 transition-colors">
                     <td className="px-4 py-4 text-center text-slate-400 font-medium">
-                      {index + 1}
+                      {(currentPage - 1) * ITEMS_PER_PAGE + index + 1}
                     </td>
                     <td className="px-4 py-4">
                       <div>
@@ -408,6 +415,11 @@ export function UserManagement() {
               </tbody>
             </table>
           </div>
+          <Pagination 
+            currentPage={currentPage} 
+            totalPages={totalPages} 
+            onPageChange={setCurrentPage} 
+          />
         </CardContent>
       </Card>
 
