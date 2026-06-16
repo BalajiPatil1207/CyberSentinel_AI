@@ -135,28 +135,28 @@ export function AIAssistant() {
           
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
             {messages.map((msg) => (
-              <div key={msg.id} className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
+              <div key={msg.id} className={`flex gap-2 md:gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
+                <div className={`hidden md:flex w-10 h-10 rounded-full items-center justify-center shrink-0 ${
                   msg.role === 'ai' ? 'bg-brand-cyan/20 text-brand-cyan' : 'bg-slate-800 text-slate-300'
                 }`}>
                   {msg.role === 'ai' ? <Bot className="w-6 h-6" /> : <User className="w-6 h-6" />}
                 </div>
-                <div className={`max-w-[75%] rounded-2xl p-4 ${
+                <div className={`max-w-[85%] md:max-w-[75%] rounded-2xl p-3 md:p-4 shadow-sm ${
                   msg.role === 'ai' 
-                    ? 'bg-slate-900/80 border border-slate-800 text-slate-300 rounded-tl-none' 
-                    : 'bg-brand-blue text-white rounded-tr-none'
+                    ? 'bg-[#202c33] md:bg-slate-900/80 md:border border-slate-800 text-slate-200 rounded-tl-sm md:rounded-tl-none' 
+                    : 'bg-[#005c4b] md:bg-brand-blue text-white rounded-tr-sm md:rounded-tr-none'
                 }`}>
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                  <p className="text-[14px] md:text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                 </div>
               </div>
             ))}
             
             {isTyping && (
-              <div className="flex gap-4">
-                <div className="w-10 h-10 rounded-full bg-brand-cyan/20 text-brand-cyan flex items-center justify-center shrink-0">
+              <div className="flex gap-2 md:gap-4">
+                <div className="hidden md:flex w-10 h-10 rounded-full bg-brand-cyan/20 text-brand-cyan items-center justify-center shrink-0">
                   <Bot className="w-6 h-6" />
                 </div>
-                <div className="bg-slate-900/80 border border-slate-800 rounded-2xl rounded-tl-none p-4 flex items-center gap-2">
+                <div className="bg-[#202c33] md:bg-slate-900/80 md:border border-slate-800 rounded-2xl rounded-tl-sm md:rounded-tl-none p-3 md:p-4 flex items-center gap-2 shadow-sm">
                   <div className="w-2 h-2 bg-brand-cyan rounded-full animate-bounce"></div>
                   <div className="w-2 h-2 bg-brand-cyan rounded-full animate-bounce [animation-delay:0.2s]"></div>
                   <div className="w-2 h-2 bg-brand-cyan rounded-full animate-bounce [animation-delay:0.4s]"></div>
@@ -180,16 +180,18 @@ export function AIAssistant() {
             </div>
             <form 
               onSubmit={(e) => { e.preventDefault(); handleSend(); }}
-              className="flex gap-3"
+              className="flex gap-2 items-end"
             >
-              <Input 
-                placeholder="Ask about threats, vulnerabilities, or request a summary..." 
-                className="flex-1"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-              />
-              <Button type="submit" variant="cyan" disabled={!input.trim() || isTyping}>
-                <Send className="w-4 h-4 mr-2" /> Send
+              <div className="flex-1 bg-slate-800 rounded-2xl md:rounded-lg overflow-hidden">
+                <Input 
+                  placeholder="Message AI Assistant..." 
+                  className="w-full bg-transparent border-0 focus:ring-0 px-4 py-3"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                />
+              </div>
+              <Button type="submit" variant="cyan" className="rounded-full w-12 h-12 p-0 flex items-center justify-center shrink-0" disabled={!input.trim() || isTyping}>
+                <Send className="w-5 h-5 ml-1" />
               </Button>
             </form>
           </div>
