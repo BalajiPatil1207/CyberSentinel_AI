@@ -20,6 +20,7 @@ const navItems = [
   { id: 'alerts', path: '/alerts', icon: Bell, label: 'Alerts', roles: ['Super Admin', 'Security Analyst', 'Employee'] },
   { id: 'reports', path: '/reports', icon: FileText, label: 'Reports', roles: ['Super Admin', 'Security Analyst'] },
   { id: 'users', path: '/users', icon: Users, label: 'User Management', roles: ['Super Admin'] },
+  { id: 'permissions', path: '/permissions', icon: Shield, label: 'Permissions', roles: ['Super Admin'] },
   { id: 'settings', path: '/settings', icon: Settings, label: 'Settings', roles: ['Super Admin', 'Security Analyst', 'Employee'] },
 ];
 
@@ -29,6 +30,12 @@ export function Sidebar() {
 
   const filteredNavItems = navItems.filter((item) => {
     if (!user) return false;
+    
+    // Super Admins always see all their allowed role items, ignoring specific restrictions
+    if (user.role === 'Super Admin') {
+      return !item.roles || item.roles.includes(user.role);
+    }
+
     // If user has specific permissions defined, those override the base role access
     if (user.permissions && user.permissions.length > 0) {
       return user.permissions.includes(item.id);
@@ -73,7 +80,7 @@ export function Sidebar() {
         <div className="p-4 border-t border-slate-800">
           <button 
             onClick={() => setShowLogoutConfirm(true)}
-            className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors font-medium text-sm"
+            className="flex w-full items-center justify-center cursor-pointer gap-2 px-3 py-2.5 rounded-lg text-red-500 bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 hover:text-red-400 transition-all font-bold text-sm shadow-[0_0_10px_rgba(239,68,68,0.2)] hover:shadow-[0_0_15px_rgba(239,68,68,0.4)]"
           >
             <LogOut className="w-5 h-5" />
             Logout
