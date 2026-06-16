@@ -106,6 +106,8 @@ export function UserManagement() {
   const [userToView, setUserToView] = useState(null);
 
   const openEditModal = (user) => {
+    setError('');
+    setSuccess('');
     setUserToEdit(user);
     setEditName(user.name);
     setEditRole(user.role);
