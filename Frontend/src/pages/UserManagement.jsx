@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/Card';
 import { Button } from '../components/Button';
 import { Badge } from '../components/Badge';
 import { Input } from '../components/Input';
-import { UserPlus, ShieldCheck, Mail, Lock, User as UserIcon, Eye, Edit2, Trash2, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
+import { UserPlus, ShieldCheck, Mail, Lock, User as UserIcon, Eye, Edit2, Trash2, CheckCircle, XCircle, AlertTriangle, Phone } from 'lucide-react';
 
 export function UserManagement() {
   const { users, toggleUserStatus, deleteUser, fetchData } = useData();
@@ -20,6 +20,7 @@ export function UserManagement() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('Employee');
+  const [mobile, setMobile] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleToggleStatus = async (id, currentStatus) => {
@@ -71,7 +72,7 @@ export function UserManagement() {
           'Content-Type': 'application/json',
           ...getAuthHeaders()
         },
-        body: JSON.stringify({ name, email, password, role })
+        body: JSON.stringify({ name, email, password, role, mobile })
       });
 
       const result = await response.json();
@@ -81,6 +82,7 @@ export function UserManagement() {
         setEmail('');
         setPassword('');
         setRole('Employee');
+        setMobile('');
         setShowAddForm(false);
         // Refresh users list
         fetchData();
@@ -97,6 +99,9 @@ export function UserManagement() {
   const [userToEdit, setUserToEdit] = useState(null);
   const [editName, setEditName] = useState('');
   const [editRole, setEditRole] = useState('Employee');
+  const [editMobile, setEditMobile] = useState('');
+  const [editEmail, setEditEmail] = useState('');
+  const [editPassword, setEditPassword] = useState('');
   
   const [userToView, setUserToView] = useState(null);
 
@@ -104,12 +109,20 @@ export function UserManagement() {
     setUserToEdit(user);
     setEditName(user.name);
     setEditRole(user.role);
+    setEditMobile(user.mobile || '');
+    setEditEmail(user.email || '');
+    setEditPassword(''); // Reset password field
   };
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
+    if (editPassword && editPassword.length < 6) {
+      setError('Password must be at least 6 characters.');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -119,7 +132,13 @@ export function UserManagement() {
           'Content-Type': 'application/json',
           ...getAuthHeaders()
         },
-        body: JSON.stringify({ name: editName, role: editRole })
+        body: JSON.stringify({ 
+          name: editName, 
+          role: editRole, 
+          mobile: editMobile, 
+          email: editEmail, 
+          ...(editPassword ? { password: editPassword } : {}) 
+        })
       });
 
       const result = await response.json();
@@ -199,6 +218,20 @@ export function UserManagement() {
                 </div>
 
                 <div className="space-y-1">
+                  <label className="text-xs font-medium text-slate-400 ml-1">Mobile Number</label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-2.5 h-5 w-5 text-slate-500" />
+                    <Input 
+                      type="text" 
+                      placeholder="+91 9876543210" 
+                      className="pl-10"
+                      value={mobile}
+                      onChange={(e) => setMobile(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
                   <label className="text-xs font-medium text-slate-400 ml-1">Password</label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-2.5 h-5 w-5 text-slate-500" />
@@ -248,6 +281,7 @@ export function UserManagement() {
                 <tr>
                   <th className="px-4 py-3 rounded-tl-lg">User</th>
                   <th className="px-4 py-3">Role</th>
+                  <th className="px-4 py-3">Mobile</th>
                   <th className="px-4 py-3">Status</th>
                   <th className="px-4 py-3 rounded-tr-lg text-right">Actions</th>
                 </tr>
@@ -265,6 +299,9 @@ export function UserManagement() {
                       <Badge variant={user.role === 'Super Admin' ? 'purple' : user.role === 'Security Analyst' ? 'info' : 'default'}>
                         {user.role}
                       </Badge>
+                    </td>
+                    <td className="px-4 py-4 text-sm text-slate-300">
+                      {user.mobile || '-'}
                     </td>
                     <td className="px-4 py-4">
                       <Badge variant={user.status === 'Active' ? 'success' : 'destructive'}>
@@ -365,6 +402,43 @@ export function UserManagement() {
                   </div>
                 </div>
                 <div className="space-y-1">
+                  <label className="text-xs font-medium text-slate-400 ml-1">Mobile Number</label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-2.5 h-5 w-5 text-slate-500" />
+                    <Input 
+                      type="text" 
+                      value={editMobile}
+                      onChange={(e) => setEditMobile(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-slate-400 ml-1">Email Address</label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-2.5 h-5 w-5 text-slate-500" />
+                    <Input 
+                      type="email" 
+                      value={editEmail}
+                      onChange={(e) => setEditEmail(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-slate-400 ml-1">New Password <span className="text-slate-500 text-[10px]">(Leave blank to keep current)</span></label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-2.5 h-5 w-5 text-slate-500" />
+                    <Input 
+                      type="password" 
+                      placeholder="••••••••"
+                      value={editPassword}
+                      onChange={(e) => setEditPassword(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-1">
                   <label className="text-xs font-medium text-slate-400 ml-1">Access Role</label>
                   <div className="relative">
                     <ShieldCheck className="absolute left-3 top-2.5 h-5 w-5 text-slate-500" />
@@ -408,6 +482,10 @@ export function UserManagement() {
                 <div>
                   <p className="text-xs text-slate-500 uppercase">Email</p>
                   <p className="text-white font-medium">{userToView.email}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-slate-500 uppercase">Mobile</p>
+                  <p className="text-white font-medium">{userToView.mobile || 'Not provided'}</p>
                 </div>
                 <div>
                   <p className="text-xs text-slate-500 uppercase">Role</p>
