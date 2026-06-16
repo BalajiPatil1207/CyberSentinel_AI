@@ -500,6 +500,27 @@ const patchVulnerability = async (req, res, next) => {
 };
 
 /**
+ * @desc    Delete a vulnerability record
+ * @route   DELETE /api/security/vulnerabilities/:id
+ * @access  Protected (Super Admin, Security Analyst)
+ */
+const deleteVulnerability = async (req, res, next) => {
+  try {
+    const vulnId = req.params.id;
+
+    const deletedVuln = await Vulnerability.findByIdAndDelete(vulnId);
+
+    if (!deletedVuln) {
+      throwNotFoundError("Vulnerability record not found.");
+    }
+
+    return sendSuccess(res, null, "Vulnerability record deleted successfully.");
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * @desc    Upload and analyze binary/script file in Sandbox
  * @route   POST /api/security/malware-upload
  * @access  Protected (All logged-in roles)
@@ -613,4 +634,5 @@ export {
   malwareUpload,
   getVulnerabilities,
   patchVulnerability,
+  deleteVulnerability,
 };
