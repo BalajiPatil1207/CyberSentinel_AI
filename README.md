@@ -71,7 +71,7 @@ Make sure you have the following installed on your local machine:
    ```
 
 3. **Frontend Setup:**
-   ```bash
+   ```bashcd 
    cd ../Frontend
    npm install
    ```
