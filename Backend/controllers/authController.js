@@ -21,7 +21,7 @@ const generateToken = (id) => {
  * @access  Public (or restricted in production)
  */
 const register = async (req, res, next) => {
-  const { name, email, password, role } = req.body;
+  const { name, email, password, role, mobile } = req.body;
 
   try {
     // 1. Validation
@@ -40,6 +40,7 @@ const register = async (req, res, next) => {
       name,
       email,
       password,
+      mobile: mobile || "",
       role: role || "Employee",
     });
 
@@ -50,6 +51,7 @@ const register = async (req, res, next) => {
         id: user._id,
         name: user.name,
         email: user.email,
+        mobile: user.mobile,
         role: user.role,
         status: user.status,
       },
@@ -99,6 +101,7 @@ const login = async (req, res, next) => {
         id: user._id,
         name: user.name,
         email: user.email,
+        mobile: user.mobile,
         role: user.role,
         status: user.status,
       },
@@ -170,6 +173,7 @@ const updateUserStatus = async (req, res, next) => {
       id: user._id,
       name: user.name,
       email: user.email,
+      mobile: user.mobile,
       role: user.role,
       status: user.status,
     };
@@ -214,7 +218,7 @@ const deleteUser = async (req, res, next) => {
  */
 const editUser = async (req, res, next) => {
   const { id } = req.params;
-  const { name, role } = req.body;
+  const { name, role, mobile, email, password } = req.body;
 
   try {
     const user = await User.findById(id);
@@ -227,13 +231,25 @@ const editUser = async (req, res, next) => {
     }
 
     if (name) user.name = name;
+    if (email) {
+      // Check if the new email already exists
+      if (email !== user.email) {
+        const emailExists = await User.findOne({ email });
+        if (emailExists) {
+          throwBadRequest("Email is already in use by another account.");
+        }
+        user.email = email;
+      }
+    }
+    if (password) user.password = password;
+    if (mobile !== undefined) user.mobile = mobile;
     if (role && ["Security Analyst", "Employee"].includes(role)) {
       user.role = role;
     }
 
     await user.save();
 
-    return sendSuccess(res, { id: user._id, name: user.name, role: user.role, email: user.email, status: user.status }, "User updated successfully!");
+    return sendSuccess(res, { id: user._id, name: user.name, role: user.role, email: user.email, mobile: user.mobile, status: user.status }, "User updated successfully!");
   } catch (error) {
     next(error);
   }
