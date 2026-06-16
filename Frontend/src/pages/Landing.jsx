@@ -98,10 +98,10 @@ export function Landing() {
           </div>
 
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
-            <button onClick={() => scrollToSection('home')} className="hover:text-brand-cyan transition-colors cursor-pointer">Home</button>
-            <button onClick={() => scrollToSection('about')} className="hover:text-brand-cyan transition-colors cursor-pointer">About</button>
-            <button onClick={() => scrollToSection('features')} className="hover:text-brand-cyan transition-colors cursor-pointer">Features</button>
-            <button onClick={() => scrollToSection('roadmap')} className="hover:text-brand-cyan transition-colors cursor-pointer">Roadmap</button>
+            <a href="#home" className="hover:text-brand-cyan transition-colors cursor-pointer">Home</a>
+            <a href="#about" className="hover:text-brand-cyan transition-colors cursor-pointer">About</a>
+            <a href="#features" className="hover:text-brand-cyan transition-colors cursor-pointer">Features</a>
+            <a href="#roadmap" className="hover:text-brand-cyan transition-colors cursor-pointer">Roadmap</a>
           </div>
 
           <div className="hidden md:flex items-center gap-4">
@@ -140,10 +140,10 @@ export function Landing() {
               className="md:hidden absolute top-full left-0 w-full bg-[#0f172a]/95 backdrop-blur-xl border-b border-slate-800 overflow-hidden shadow-2xl"
             >
               <div className="flex flex-col px-8 py-6 space-y-4">
-                <button onClick={() => scrollToSection('home')} className="text-left text-slate-300 hover:text-brand-cyan font-medium cursor-pointer py-2">Home</button>
-                <button onClick={() => scrollToSection('about')} className="text-left text-slate-300 hover:text-brand-cyan font-medium cursor-pointer py-2">About</button>
-                <button onClick={() => scrollToSection('features')} className="text-left text-slate-300 hover:text-brand-cyan font-medium cursor-pointer py-2">Features</button>
-                <button onClick={() => scrollToSection('roadmap')} className="text-left text-slate-300 hover:text-brand-cyan font-medium cursor-pointer py-2">Roadmap</button>
+                <a href="#home" onClick={() => setMobileMenuOpen(false)} className="block w-full text-left text-slate-300 hover:text-brand-cyan font-medium cursor-pointer py-2">Home</a>
+                <a href="#about" onClick={() => setMobileMenuOpen(false)} className="block w-full text-left text-slate-300 hover:text-brand-cyan font-medium cursor-pointer py-2">About</a>
+                <a href="#features" onClick={() => setMobileMenuOpen(false)} className="block w-full text-left text-slate-300 hover:text-brand-cyan font-medium cursor-pointer py-2">Features</a>
+                <a href="#roadmap" onClick={() => setMobileMenuOpen(false)} className="block w-full text-left text-slate-300 hover:text-brand-cyan font-medium cursor-pointer py-2">Roadmap</a>
                 <div className="h-px bg-slate-800 w-full my-2"></div>
                 <button onClick={() => navigate('/login')} className="text-left text-slate-300 hover:text-white font-medium cursor-pointer py-2">Sign In</button>
                 <button onClick={() => navigate('/login')} className="text-center w-full px-5 py-4 rounded-xl bg-brand-cyan text-brand-darker font-bold text-sm shadow-[0_0_15px_rgba(0,240,255,0.4)] cursor-pointer mt-2">Get Started</button>
@@ -201,12 +201,12 @@ export function Landing() {
             Enter Dashboard
             <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </button>
-          <button
-            onClick={() => scrollToSection('about')}
-            className="px-8 py-4 rounded-xl bg-slate-800/80 text-white font-semibold text-lg hover:bg-slate-700 transition-all border border-slate-700 backdrop-blur-md cursor-pointer"
+          <a
+            href="#about"
+            className="px-8 py-4 rounded-xl bg-slate-800/80 text-white font-semibold text-lg hover:bg-slate-700 transition-all border border-slate-700 backdrop-blur-md cursor-pointer inline-block"
           >
             Explore Platform
-          </button>
+          </a>
         </motion.div>
       </main>
 
@@ -323,12 +323,12 @@ export function Landing() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: idx * 0.1 }}
-                className="relative pt-8"
+                className="relative pt-8 h-full flex flex-col"
               >
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-slate-800 border-2 border-brand-cyan flex items-center justify-center z-10 shadow-[0_0_15px_rgba(0,240,255,0.3)]">
                   <div className="w-2 h-2 rounded-full bg-brand-cyan"></div>
                 </div>
-                <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-6 text-center mt-6 hover:bg-slate-800 transition-colors">
+                <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-6 text-center mt-6 hover:bg-slate-800 transition-colors flex-1 flex flex-col items-center">
                   <div className="flex justify-center mb-4">{plan.icon}</div>
                   <h4 className="text-lg font-bold text-white mb-3">{plan.title}</h4>
                   <p className="text-sm text-slate-400 leading-relaxed">{plan.desc}</p>
