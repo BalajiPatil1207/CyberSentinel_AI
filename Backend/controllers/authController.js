@@ -21,7 +21,7 @@ const generateToken = (id) => {
  * @access  Public (or restricted in production)
  */
 const register = async (req, res, next) => {
-  const { name, email, password, role, mobile } = req.body;
+  const { name, email, password, role, mobile, permissions } = req.body;
 
   try {
     // 1. Validation
@@ -42,6 +42,7 @@ const register = async (req, res, next) => {
       password,
       mobile: mobile || "",
       role: role || "Employee",
+      permissions: permissions || [],
     });
 
     // 4. Generate token and return success
@@ -104,6 +105,7 @@ const login = async (req, res, next) => {
         mobile: user.mobile,
         role: user.role,
         status: user.status,
+        permissions: user.permissions,
       },
       token,
     };
@@ -218,7 +220,7 @@ const deleteUser = async (req, res, next) => {
  */
 const editUser = async (req, res, next) => {
   const { id } = req.params;
-  const { name, role, mobile, email, password } = req.body;
+  const { name, role, mobile, email, password, permissions } = req.body;
 
   try {
     const user = await User.findById(id);
@@ -245,6 +247,9 @@ const editUser = async (req, res, next) => {
     if (mobile !== undefined) user.mobile = mobile;
     if (role && ["Security Analyst", "Employee"].includes(role)) {
       user.role = role;
+    }
+    if (permissions !== undefined && Array.isArray(permissions)) {
+      user.permissions = permissions;
     }
 
     await user.save();
