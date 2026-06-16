@@ -3,6 +3,7 @@ import { useData } from '../context/DataContext';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/Card';
 import { Button } from '../components/Button';
 import { Badge } from '../components/Badge';
+import { Pagination } from '../components/Pagination';
 import { Plus, MessageSquare, Clock, CheckCircle, AlertTriangle, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -11,6 +12,12 @@ export function IncidentResponse() {
   const { user } = useAuth();
   const [selectedIncident, setSelectedIncident] = useState(null);
   
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 30;
+  const totalPages = Math.ceil(incidents.length / ITEMS_PER_PAGE);
+  const paginatedIncidents = incidents.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
   // Create ticket form states
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newTitle, setNewTitle] = useState('');
@@ -190,7 +197,7 @@ export function IncidentResponse() {
                   No active incidents logged.
                 </div>
               ) : (
-                incidents.map((incident) => (
+                paginatedIncidents.map((incident) => (
                   <div 
                     key={incident._id || incident.id}
                     onClick={() => setSelectedIncident(incident)}
@@ -213,6 +220,13 @@ export function IncidentResponse() {
                 ))
               )}
             </CardContent>
+            <div className="border-t border-slate-800 p-2">
+              <Pagination 
+                currentPage={currentPage} 
+                totalPages={totalPages} 
+                onPageChange={setCurrentPage} 
+              />
+            </div>
           </Card>
         </div>
 
