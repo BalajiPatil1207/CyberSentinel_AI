@@ -207,6 +207,38 @@ const deleteUser = async (req, res, next) => {
   }
 };
 
+/**
+ * @desc    Edit a user (name and role)
+ * @route   PUT /api/users/:id
+ * @access  Protected (Super Admin only)
+ */
+const editUser = async (req, res, next) => {
+  const { id } = req.params;
+  const { name, role } = req.body;
+
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      throwNotFound(`User with ID ${id} not found.`);
+    }
+
+    if (user.email === "admin@patilcybershield.com") {
+      throwBadRequest("The primary Super Admin user account cannot be edited.");
+    }
+
+    if (name) user.name = name;
+    if (role && ["Security Analyst", "Employee"].includes(role)) {
+      user.role = role;
+    }
+
+    await user.save();
+
+    return sendSuccess(res, { id: user._id, name: user.name, role: user.role, email: user.email, status: user.status }, "User updated successfully!");
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default {
   register,
   login,
@@ -214,6 +246,7 @@ export default {
   getUsers,
   updateUserStatus,
   deleteUser,
+  editUser,
 };
 
 export {
@@ -223,4 +256,5 @@ export {
   getUsers,
   updateUserStatus,
   deleteUser,
+  editUser,
 };
