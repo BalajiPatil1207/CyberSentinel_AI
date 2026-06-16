@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, Lock, Activity, Bot, Zap, Globe, ChevronRight, Phone, MessageCircle, Server, Eye, TrendingUp, ShieldCheck, Mail, MapPin } from 'lucide-react';
+import { Shield, Lock, Activity, Bot, Zap, Globe, ChevronRight, Phone, MessageCircle, Server, Eye, TrendingUp, ShieldCheck, Mail, MapPin, Menu, X } from 'lucide-react';
 
 export function Landing() {
   const navigate = useNavigate();
   const [showContact, setShowContact] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const features = [
     {
@@ -66,6 +67,7 @@ export function Landing() {
   const scrollToSection = (id) => {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: 'smooth' });
+    setMobileMenuOpen(false);
   };
 
   return (
@@ -98,21 +100,50 @@ export function Landing() {
             <button onClick={() => scrollToSection('roadmap')} className="hover:text-brand-cyan transition-colors">Roadmap</button>
           </div>
 
-          <div className="flex items-center gap-4">
-            <button
+          <div className="hidden md:flex items-center gap-4">
+            <button 
               onClick={() => navigate('/login')}
-              className="text-slate-300 hover:text-white transition-colors font-medium text-sm hidden sm:block"
+              className="text-slate-300 hover:text-white transition-colors font-medium text-sm"
             >
               Sign In
             </button>
-            <button
+            <button 
               onClick={() => navigate('/login')}
               className="px-5 py-2 rounded-lg bg-brand-cyan text-brand-darker font-semibold text-sm hover:bg-[#00d0dd] transition-all shadow-[0_0_15px_rgba(0,240,255,0.4)] hover:shadow-[0_0_25px_rgba(0,240,255,0.6)] transform hover:-translate-y-0.5"
             >
               Get Started
             </button>
           </div>
+
+          {/* Mobile Menu Button */}
+          <div className="md:hidden flex items-center">
+            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="text-slate-300 hover:text-white">
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Menu Dropdown */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div 
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="md:hidden bg-[#0f172a] border-b border-slate-800 overflow-hidden"
+            >
+              <div className="flex flex-col px-8 py-4 space-y-4">
+                <button onClick={() => scrollToSection('home')} className="text-left text-slate-300 hover:text-brand-cyan font-medium">Home</button>
+                <button onClick={() => scrollToSection('about')} className="text-left text-slate-300 hover:text-brand-cyan font-medium">About</button>
+                <button onClick={() => scrollToSection('features')} className="text-left text-slate-300 hover:text-brand-cyan font-medium">Features</button>
+                <button onClick={() => scrollToSection('roadmap')} className="text-left text-slate-300 hover:text-brand-cyan font-medium">Roadmap</button>
+                <div className="h-px bg-slate-800 w-full my-2"></div>
+                <button onClick={() => navigate('/login')} className="text-left text-slate-300 hover:text-white font-medium">Sign In</button>
+                <button onClick={() => navigate('/login')} className="text-center w-full px-5 py-3 rounded-lg bg-brand-cyan text-brand-darker font-semibold text-sm shadow-[0_0_15px_rgba(0,240,255,0.4)]">Get Started</button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
       <div className="pt-24"></div>
@@ -129,11 +160,11 @@ export function Landing() {
           <span className="text-sm font-medium text-slate-300">Next-Gen Enterprise Security Platform</span>
         </motion.div>
 
-        <motion.h1
+        <motion.h1 
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 leading-tight max-w-5xl"
+          className="text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tight mb-8 leading-tight max-w-5xl"
         >
           Secure your infrastructure with <br className="hidden md:block" />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-cyan to-blue-500">
@@ -354,12 +385,12 @@ export function Landing() {
             </div>
           </div>
 
-          <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-slate-500">
+          <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-slate-500 text-center md:text-left">
             <p>CyberSentinel AI © {new Date().getFullYear()} - Engineered by <span className="text-white font-medium">Balaji Patil</span></p>
-            <div className="flex gap-6">
-              <a href="#" className="hover:text-white transition-colors cursor-pointer">Privacy Policy</a>
-              <a href="#" className="hover:text-white transition-colors cursor-pointer">Terms of Service</a>
-              <a href="#" className="hover:text-white transition-colors cursor-pointer">Cookie Policy</a>
+            <div className="flex flex-wrap justify-center gap-4 md:gap-6">
+              <button onClick={() => navigate('/privacy-policy')} className="hover:text-white transition-colors cursor-pointer">Privacy Policy</button>
+              <button onClick={() => navigate('/terms-of-service')} className="hover:text-white transition-colors cursor-pointer">Terms of Service</button>
+              <button onClick={() => navigate('/cookie-policy')} className="hover:text-white transition-colors cursor-pointer">Cookie Policy</button>
             </div>
           </div>
         </div>
