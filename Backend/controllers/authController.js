@@ -106,6 +106,7 @@ const login = async (req, res, next) => {
         role: user.role,
         status: user.status,
         permissions: user.permissions,
+        profilePicture: user.profilePicture,
       },
       token,
     };
@@ -286,6 +287,10 @@ const updateProfile = async (req, res, next) => {
       user.password = req.body.password;
     }
 
+    if (req.body.profilePicture !== undefined) {
+      user.profilePicture = req.body.profilePicture;
+    }
+
     await user.save();
 
     return sendSuccess(res, {
@@ -295,7 +300,8 @@ const updateProfile = async (req, res, next) => {
       role: user.role,
       mobile: user.mobile,
       status: user.status,
-      permissions: user.permissions
+      permissions: user.permissions,
+      profilePicture: user.profilePicture
     }, "Profile updated successfully!");
   } catch (error) {
     next(error);
