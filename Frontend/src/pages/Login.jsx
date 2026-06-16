@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Shield, Lock, Mail, User, ShieldCheck } from 'lucide-react';
+import { Shield, Lock, Mail, User, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/Card';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
@@ -9,6 +9,7 @@ import { Button } from '../components/Button';
 export function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
@@ -110,12 +111,19 @@ export function Login() {
                 <div className="relative">
                   <Lock className="absolute left-3 top-2.5 h-5 w-5 text-slate-500" />
                   <Input 
-                    type="password" 
+                    type={showPassword ? "text" : "password"} 
                     placeholder="••••••••" 
-                    className={`pl-10 ${passwordError ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+                    className={`pl-10 pr-10 ${passwordError ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
+                  <button 
+                    type="button" 
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-2.5 text-slate-500 hover:text-slate-300 transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
                 </div>
                 {passwordError && (
                   <span className="text-red-400 text-xs mt-1 block ml-1">{passwordError}</span>
