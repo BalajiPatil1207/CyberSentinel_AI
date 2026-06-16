@@ -94,6 +94,49 @@ export function UserManagement() {
     setLoading(false);
   };
 
+  const [userToEdit, setUserToEdit] = useState(null);
+  const [editName, setEditName] = useState('');
+  const [editRole, setEditRole] = useState('Employee');
+  
+  const [userToView, setUserToView] = useState(null);
+
+  const openEditModal = (user) => {
+    setUserToEdit(user);
+    setEditName(user.name);
+    setEditRole(user.role);
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+    setLoading(true);
+
+    try {
+      const response = await fetch(`/api/users/${userToEdit._id || userToEdit.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders()
+        },
+        body: JSON.stringify({ name: editName, role: editRole })
+      });
+
+      const result = await response.json();
+      if (response.ok && result.success) {
+        setSuccess('User updated successfully!');
+        setUserToEdit(null);
+        fetchData();
+        setTimeout(() => setSuccess(''), 3000);
+      } else {
+        setError(result.message || 'Failed to update user.');
+      }
+    } catch (err) {
+      setError('Network error while updating user.');
+    }
+    setLoading(false);
+  };
+
   return (
     <div className="space-y-6 relative">
       <div className="flex justify-between items-center">
@@ -233,6 +276,7 @@ export function UserManagement() {
                         <Button 
                           variant="ghost" 
                           title="View Details"
+                          onClick={() => setUserToView(user)}
                           className="p-1.5 h-auto text-slate-400 hover:text-brand-cyan hover:bg-slate-800/50"
                         >
                           <Eye className="w-4 h-4" />
@@ -240,6 +284,7 @@ export function UserManagement() {
                         <Button 
                           variant="ghost" 
                           title="Edit User"
+                          onClick={() => openEditModal(user)}
                           className="p-1.5 h-auto text-slate-400 hover:text-blue-400 hover:bg-slate-800/50"
                         >
                           <Edit2 className="w-4 h-4" />
@@ -291,6 +336,94 @@ export function UserManagement() {
                   </Button>
                   <Button variant="primary" className="flex-1 bg-red-500 hover:bg-red-600 border-0" onClick={confirmDelete}>
                     Yes, Delete
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+      {/* Edit User Modal */}
+      {userToEdit && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <Card className="w-full max-w-md bg-slate-900 border-brand-cyan/30">
+            <CardHeader>
+              <CardTitle>Edit User</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleEditSubmit} className="space-y-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-slate-400 ml-1">Full Name</label>
+                  <div className="relative">
+                    <UserIcon className="absolute left-3 top-2.5 h-5 w-5 text-slate-500" />
+                    <Input 
+                      type="text" 
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-slate-400 ml-1">Access Role</label>
+                  <div className="relative">
+                    <ShieldCheck className="absolute left-3 top-2.5 h-5 w-5 text-slate-500" />
+                    <select
+                      className="w-full bg-slate-900 border border-slate-700 rounded-lg pl-10 pr-4 py-2 text-sm text-white focus:outline-none focus:border-brand-cyan transition-colors"
+                      value={editRole}
+                      onChange={(e) => setEditRole(e.target.value)}
+                    >
+                      <option value="Employee">Employee</option>
+                      <option value="Security Analyst">Security Analyst</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="flex w-full gap-3 mt-4">
+                  <Button variant="outline" className="flex-1" type="button" onClick={() => setUserToEdit(null)}>
+                    Cancel
+                  </Button>
+                  <Button variant="cyan" className="flex-1" type="submit" disabled={loading}>
+                    {loading ? 'Saving...' : 'Save Changes'}
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* View User Details Modal */}
+      {userToView && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <Card className="w-full max-w-sm bg-slate-900 border-slate-700">
+            <CardHeader>
+              <CardTitle>User Details</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <p className="text-xs text-slate-500 uppercase">Name</p>
+                  <p className="text-white font-medium">{userToView.name}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-slate-500 uppercase">Email</p>
+                  <p className="text-white font-medium">{userToView.email}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-slate-500 uppercase">Role</p>
+                  <Badge variant={userToView.role === 'Super Admin' ? 'purple' : userToView.role === 'Security Analyst' ? 'info' : 'default'} className="mt-1">
+                    {userToView.role}
+                  </Badge>
+                </div>
+                <div>
+                  <p className="text-xs text-slate-500 uppercase">Status</p>
+                  <Badge variant={userToView.status === 'Active' ? 'success' : 'destructive'} className="mt-1">
+                    {userToView.status}
+                  </Badge>
+                </div>
+                <div className="pt-4">
+                  <Button variant="outline" className="w-full" onClick={() => setUserToView(null)}>
+                    Close
                   </Button>
                 </div>
               </div>
