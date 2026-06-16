@@ -1,27 +1,70 @@
 import express from "express";
-import { upload } from "../config/cloudinary.js";
+import { uploadLocal } from "../middlewares/uploadMiddleware.js";
 import { sendSuccess } from "../utils/apiResponse.js";
 import { protect } from "../middlewares/authMiddleware.js";
+import { throwBadRequest } from "../utils/ApiError.js";
+import sharp from "sharp";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const router = express.Router();
 
+// Ensure upload directory exists
+const uploadDir = path.join(__dirname, "../upload/profiles");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
 /**
- * @desc    Upload a single file to Cloudinary
+ * @desc    Upload a single file locally with compression
  * @route   POST /api/upload
  * @access  Protected
  */
-router.post("/", protect, upload.single("image"), (req, res, next) => {
+router.post("/", protect, uploadLocal.single("image"), async (req, res, next) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ success: false, message: "No file provided" });
+      throwBadRequest("No file provided");
     }
 
-    // req.file contains the file details including the Cloudinary URL (req.file.path)
+    const isPdf = req.file.mimetype === 'application/pdf';
+    
+    // We will save to a file
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    
+    let filename = "";
+    let size = 0;
+    
+    if (isPdf) {
+      // Direct save for PDF
+      filename = `doc-${uniqueSuffix}.pdf`;
+      const filePath = path.join(uploadDir, filename);
+      fs.writeFileSync(filePath, req.file.buffer);
+      size = req.file.size;
+    } else {
+      // Compress image using sharp
+      filename = `img-${uniqueSuffix}.webp`;
+      const filePath = path.join(uploadDir, filename);
+      
+      const info = await sharp(req.file.buffer)
+        .resize(800, 800, {
+          fit: sharp.fit.inside,
+          withoutEnlargement: true
+        })
+        .webp({ quality: 80 }) // compress to webp
+        .toFile(filePath);
+        
+      size = info.size;
+    }
+
     const fileData = {
-      url: req.file.path,
-      public_id: req.file.filename, // This is the public_id in Cloudinary
+      url: `/uploads/profiles/${filename}`,
+      public_id: filename, 
       originalName: req.file.originalname,
-      size: req.file.size,
+      size: size,
     };
 
     return sendSuccess(res, fileData, "File uploaded successfully");
