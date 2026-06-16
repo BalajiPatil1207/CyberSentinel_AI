@@ -1,16 +1,22 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Bell, UserCircle, Search } from 'lucide-react';
+import { Bell, UserCircle, Search, Menu, X, LogOut } from 'lucide-react';
 import { useData } from '../context/DataContext';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, NavLink } from 'react-router-dom';
+import { getFilteredNavItems } from './Sidebar';
+import { cn } from '../components/Card';
 
 export function Topbar() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { alerts, markAlertAsRead } = useData();
   const navigate = useNavigate();
   const location = useLocation();
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const dropdownRef = useRef(null);
+  const mobileMenuRef = useRef(null);
+  
+  const filteredNavItems = getFilteredNavItems(user);
   
   const unreadAlertsList = alerts.filter(a => !a.isRead);
   const unreadAlerts = unreadAlertsList.length;
@@ -19,6 +25,9 @@ export function Topbar() {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowNotifications(false);
+      }
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target)) {
+        setShowMobileMenu(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -90,14 +99,56 @@ export function Topbar() {
               navigate('/profile');
             }
           }}
-          className="flex items-center gap-3 pl-6 border-l border-slate-700 hover:opacity-80 transition-opacity text-left cursor-pointer"
+          className="flex items-center gap-3 pl-4 md:pl-6 border-l border-slate-700 hover:opacity-80 transition-opacity text-left cursor-pointer"
         >
-          <div className="text-right">
+          <div className="hidden sm:block text-right">
             <p className="text-sm font-medium text-slate-200 leading-none">{user?.name}</p>
             <p className="text-xs text-brand-cyan mt-1">{user?.role}</p>
           </div>
           <UserCircle className="w-8 h-8 text-slate-400 hover:text-brand-cyan transition-colors" />
         </button>
+
+        {/* Mobile Menu Toggle */}
+        <div className="md:hidden relative" ref={mobileMenuRef}>
+          <button 
+            onClick={() => setShowMobileMenu(!showMobileMenu)}
+            className="text-slate-400 hover:text-white transition-colors pl-4 border-l border-slate-700 h-8 flex items-center"
+          >
+            {showMobileMenu ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+          
+          {showMobileMenu && (
+            <div className="absolute right-0 mt-5 w-64 bg-slate-900 border border-slate-700 rounded-lg shadow-xl overflow-hidden z-50">
+              <div className="p-2 max-h-[80vh] overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-slate-900 [&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-slate-600">
+                {filteredNavItems.map((item) => (
+                  <NavLink
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setShowMobileMenu(false)}
+                    className={({ isActive }) => cn(
+                      "flex items-center gap-3 px-3 py-3 rounded-lg transition-colors font-medium text-sm mb-1",
+                      isActive 
+                        ? "bg-brand-blue/20 text-brand-cyan" 
+                        : "text-slate-400 hover:text-slate-100 hover:bg-slate-800/50"
+                    )}
+                  >
+                    <item.icon className="w-5 h-5" />
+                    {item.label}
+                  </NavLink>
+                ))}
+                <div className="border-t border-slate-800 mt-2 pt-2">
+                  <button 
+                    onClick={() => { setShowMobileMenu(false); logout(); }}
+                    className="flex w-full items-center gap-3 px-3 py-3 rounded-lg text-red-500 hover:bg-red-500/10 transition-colors font-medium text-sm"
+                  >
+                    <LogOut className="w-5 h-5" />
+                    Logout
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );
