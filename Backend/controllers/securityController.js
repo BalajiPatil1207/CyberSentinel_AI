@@ -93,9 +93,13 @@ const runPhishingScan = async (req, res, next) => {
       }
 
       // Check for valid protocol
-      if (protocol !== "http" && protocol !== "https") {
+      if (protocol && protocol !== "http" && protocol !== "https") {
         score += 40;
         details.push("Invalid or unsupported URL protocol detected.");
+      } else if (!protocol) {
+        // No protocol provided, add a minor penalty instead of treating it as invalid
+        score += 5;
+        details.push("No explicit URL protocol provided. Assuming standard domain.");
       }
 
       // Typo-Squatting Detection
