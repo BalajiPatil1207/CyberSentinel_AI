@@ -22,7 +22,33 @@ export function UserManagement() {
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('Employee');
   const [mobile, setMobile] = useState('');
+  const [permissions, setPermissions] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const availableModules = [
+    { id: 'dashboard', label: 'Dashboard' },
+    { id: 'threat-monitoring', label: 'Threat Monitoring' },
+    { id: 'phishing-detection', label: 'Phishing Detection' },
+    { id: 'malware-analysis', label: 'Malware Analysis' },
+    { id: 'vulnerability-scanner', label: 'Vulnerability Scanner' },
+    { id: 'incident-response', label: 'Incident Response' },
+    { id: 'ai-assistant', label: 'AI Assistant' },
+    { id: 'alerts', label: 'Alerts' },
+    { id: 'reports', label: 'Reports' },
+    { id: 'users', label: 'User Management' },
+    { id: 'settings', label: 'Settings' }
+  ];
+
+  const handlePermissionToggle = (moduleId, isEdit = false) => {
+    const setState = isEdit ? setEditPermissions : setPermissions;
+    const currentState = isEdit ? editPermissions : permissions;
+    
+    if (currentState.includes(moduleId)) {
+      setState(currentState.filter(id => id !== moduleId));
+    } else {
+      setState([...currentState, moduleId]);
+    }
+  };
 
   const confirmToggleStatus = async () => {
     if (!userToToggleStatus) return;
@@ -76,7 +102,7 @@ export function UserManagement() {
           'Content-Type': 'application/json',
           ...getAuthHeaders()
         },
-        body: JSON.stringify({ name, email, password, role, mobile })
+        body: JSON.stringify({ name, email, password, role, mobile, permissions })
       });
 
       const result = await response.json();
@@ -87,6 +113,7 @@ export function UserManagement() {
         setPassword('');
         setRole('Employee');
         setMobile('');
+        setPermissions([]);
         setShowAddForm(false);
         // Refresh users list
         fetchData();
@@ -106,6 +133,7 @@ export function UserManagement() {
   const [editMobile, setEditMobile] = useState('');
   const [editEmail, setEditEmail] = useState('');
   const [editPassword, setEditPassword] = useState('');
+  const [editPermissions, setEditPermissions] = useState([]);
   
   const [userToView, setUserToView] = useState(null);
 
@@ -118,6 +146,7 @@ export function UserManagement() {
     setEditMobile(user.mobile || '');
     setEditEmail(user.email || '');
     setEditPassword(''); // Reset password field
+    setEditPermissions(user.permissions || []);
   };
 
   const handleEditSubmit = async (e) => {
@@ -143,6 +172,7 @@ export function UserManagement() {
           role: editRole, 
           mobile: editMobile, 
           email: editEmail, 
+          permissions: editPermissions,
           ...(editPassword ? { password: editPassword } : {}) 
         })
       });
@@ -265,7 +295,27 @@ export function UserManagement() {
                     </select>
                   </div>
                 </div>
+                </div>
               </div>
+
+              {/* Permissions Section (Add Form) */}
+              <div className="pt-4 border-t border-slate-800">
+                <label className="text-sm font-medium text-slate-300 mb-2 block">Specific Module Permissions (Overrides Role Default)</label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {availableModules.map(module => (
+                    <label key={module.id} className="flex items-center gap-2 text-sm text-slate-400 cursor-pointer hover:text-slate-200">
+                      <input 
+                        type="checkbox" 
+                        className="rounded border-slate-700 bg-slate-900 text-brand-cyan focus:ring-brand-cyan"
+                        checked={permissions.includes(module.id)}
+                        onChange={() => handlePermissionToggle(module.id, false)}
+                      />
+                      {module.label}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
               <div className="flex justify-end pt-2">
                 <Button type="submit" variant="cyan" disabled={loading}>
                   {loading ? 'Creating...' : 'Create Account'}
@@ -496,6 +546,25 @@ export function UserManagement() {
                     </select>
                   </div>
                 </div>
+
+                {/* Permissions Section (Edit Form) */}
+                <div className="pt-4 border-t border-slate-800">
+                  <label className="text-sm font-medium text-slate-300 mb-2 block">Specific Module Permissions (Overrides Role Default)</label>
+                  <div className="grid grid-cols-2 gap-3">
+                    {availableModules.map(module => (
+                      <label key={module.id} className="flex items-center gap-2 text-sm text-slate-400 cursor-pointer hover:text-slate-200">
+                        <input 
+                          type="checkbox" 
+                          className="rounded border-slate-700 bg-slate-900 text-brand-cyan focus:ring-brand-cyan"
+                          checked={editPermissions.includes(module.id)}
+                          onChange={() => handlePermissionToggle(module.id, true)}
+                        />
+                        {module.label}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
                 <div className="flex w-full gap-3 mt-4">
                   <Button variant="outline" className="flex-1" type="button" onClick={() => setUserToEdit(null)}>
                     Cancel
@@ -542,6 +611,20 @@ export function UserManagement() {
                   <Badge variant={userToView.status === 'Active' ? 'success' : 'destructive'} className="mt-1">
                     {userToView.status}
                   </Badge>
+                </div>
+                <div>
+                  <p className="text-xs text-slate-500 uppercase">Specific Permissions</p>
+                  <div className="mt-1 flex flex-wrap gap-1">
+                    {userToView.permissions && userToView.permissions.length > 0 ? (
+                      userToView.permissions.map(perm => (
+                        <Badge key={perm} variant="outline" className="text-xs text-slate-300 border-slate-600">
+                          {perm}
+                        </Badge>
+                      ))
+                    ) : (
+                      <span className="text-sm text-slate-500 italic">Default role access</span>
+                    )}
+                  </div>
                 </div>
                 <div className="pt-4">
                   <Button variant="outline" className="w-full" onClick={() => setUserToView(null)}>
