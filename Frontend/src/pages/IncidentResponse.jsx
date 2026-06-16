@@ -207,7 +207,7 @@ export function IncidentResponse() {
                     <h4 className="text-sm font-semibold text-white mb-2 line-clamp-2">{incident.title}</h4>
                     <div className="flex justify-between items-center text-xs">
                       {getPriorityBadge(incident.priority)}
-                      <span className="text-slate-500">{new Date(incident.date || incident.createdAt).toLocaleDateString()}</span>
+                      <span className="text-slate-500">{new Date(incident.date || incident.createdAt).toLocaleString([], { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })}</span>
                     </div>
                   </div>
                 ))
