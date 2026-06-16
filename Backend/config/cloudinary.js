@@ -1,5 +1,5 @@
 import { v2 as cloudinary } from "cloudinary";
-import { CloudinaryStorage } from "multer-storage-cloudinary";
+import multerStorageCloudinary from "multer-storage-cloudinary";
 import multer from "multer";
 import dotenv from "dotenv";
 
@@ -13,7 +13,7 @@ cloudinary.config({
 });
 
 // Setup Multer Storage Engine for Cloudinary
-const storage = new CloudinaryStorage({
+const storage = multerStorageCloudinary({
   cloudinary: cloudinary,
   params: {
     folder: "CyberSentinel_AI/uploads",
