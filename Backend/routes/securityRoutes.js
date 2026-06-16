@@ -7,7 +7,8 @@ import {
   malwareAnalyze,
   malwareUpload,
   getVulnerabilities,
-  patchVulnerability
+  patchVulnerability,
+  deleteVulnerability
 } from "../controllers/securityController.js";
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
 import { memoryUpload } from "../middlewares/memoryUpload.js";
@@ -35,6 +36,11 @@ router.patch(
   "/vulnerabilities/:id",
   authorizeRoles("Super Admin", "Security Analyst"),
   patchVulnerability
+);
+router.delete(
+  "/vulnerabilities/:id",
+  authorizeRoles("Super Admin", "Security Analyst"),
+  deleteVulnerability
 );
 
 // AI Chat Copilot and history endpoints (Allowed for all logged-in roles)
