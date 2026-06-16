@@ -94,22 +94,22 @@ export function Landing() {
           </div>
 
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
-            <button onClick={() => scrollToSection('home')} className="hover:text-brand-cyan transition-colors">Home</button>
-            <button onClick={() => scrollToSection('about')} className="hover:text-brand-cyan transition-colors">About</button>
-            <button onClick={() => scrollToSection('features')} className="hover:text-brand-cyan transition-colors">Features</button>
-            <button onClick={() => scrollToSection('roadmap')} className="hover:text-brand-cyan transition-colors">Roadmap</button>
+            <button onClick={() => scrollToSection('home')} className="hover:text-brand-cyan transition-colors cursor-pointer">Home</button>
+            <button onClick={() => scrollToSection('about')} className="hover:text-brand-cyan transition-colors cursor-pointer">About</button>
+            <button onClick={() => scrollToSection('features')} className="hover:text-brand-cyan transition-colors cursor-pointer">Features</button>
+            <button onClick={() => scrollToSection('roadmap')} className="hover:text-brand-cyan transition-colors cursor-pointer">Roadmap</button>
           </div>
 
           <div className="hidden md:flex items-center gap-4">
             <button 
               onClick={() => navigate('/login')}
-              className="text-slate-300 hover:text-white transition-colors font-medium text-sm"
+              className="text-slate-300 hover:text-white transition-colors font-medium text-sm cursor-pointer"
             >
               Sign In
             </button>
             <button 
               onClick={() => navigate('/login')}
-              className="px-5 py-2 rounded-lg bg-brand-cyan text-brand-darker font-semibold text-sm hover:bg-[#00d0dd] transition-all shadow-[0_0_15px_rgba(0,240,255,0.4)] hover:shadow-[0_0_25px_rgba(0,240,255,0.6)] transform hover:-translate-y-0.5"
+              className="px-5 py-2 rounded-lg bg-brand-cyan text-brand-darker font-semibold text-sm hover:bg-[#00d0dd] transition-all shadow-[0_0_15px_rgba(0,240,255,0.4)] hover:shadow-[0_0_25px_rgba(0,240,255,0.6)] transform hover:-translate-y-0.5 cursor-pointer"
             >
               Get Started
             </button>
@@ -117,7 +117,10 @@ export function Landing() {
 
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center">
-            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="text-slate-300 hover:text-white">
+            <button 
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)} 
+              className="text-slate-300 hover:text-white cursor-pointer p-2 relative z-50"
+            >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
@@ -130,16 +133,16 @@ export function Landing() {
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              className="md:hidden bg-[#0f172a] border-b border-slate-800 overflow-hidden"
+              className="md:hidden absolute top-full left-0 w-full bg-[#0f172a]/95 backdrop-blur-xl border-b border-slate-800 overflow-hidden shadow-2xl"
             >
-              <div className="flex flex-col px-8 py-4 space-y-4">
-                <button onClick={() => scrollToSection('home')} className="text-left text-slate-300 hover:text-brand-cyan font-medium">Home</button>
-                <button onClick={() => scrollToSection('about')} className="text-left text-slate-300 hover:text-brand-cyan font-medium">About</button>
-                <button onClick={() => scrollToSection('features')} className="text-left text-slate-300 hover:text-brand-cyan font-medium">Features</button>
-                <button onClick={() => scrollToSection('roadmap')} className="text-left text-slate-300 hover:text-brand-cyan font-medium">Roadmap</button>
+              <div className="flex flex-col px-8 py-6 space-y-4">
+                <button onClick={() => scrollToSection('home')} className="text-left text-slate-300 hover:text-brand-cyan font-medium cursor-pointer py-2">Home</button>
+                <button onClick={() => scrollToSection('about')} className="text-left text-slate-300 hover:text-brand-cyan font-medium cursor-pointer py-2">About</button>
+                <button onClick={() => scrollToSection('features')} className="text-left text-slate-300 hover:text-brand-cyan font-medium cursor-pointer py-2">Features</button>
+                <button onClick={() => scrollToSection('roadmap')} className="text-left text-slate-300 hover:text-brand-cyan font-medium cursor-pointer py-2">Roadmap</button>
                 <div className="h-px bg-slate-800 w-full my-2"></div>
-                <button onClick={() => navigate('/login')} className="text-left text-slate-300 hover:text-white font-medium">Sign In</button>
-                <button onClick={() => navigate('/login')} className="text-center w-full px-5 py-3 rounded-lg bg-brand-cyan text-brand-darker font-semibold text-sm shadow-[0_0_15px_rgba(0,240,255,0.4)]">Get Started</button>
+                <button onClick={() => navigate('/login')} className="text-left text-slate-300 hover:text-white font-medium cursor-pointer py-2">Sign In</button>
+                <button onClick={() => navigate('/login')} className="text-center w-full px-5 py-4 rounded-xl bg-brand-cyan text-brand-darker font-bold text-sm shadow-[0_0_15px_rgba(0,240,255,0.4)] cursor-pointer mt-2">Get Started</button>
               </div>
             </motion.div>
           )}
@@ -164,9 +167,9 @@ export function Landing() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tight mb-8 leading-tight max-w-5xl"
+          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-8 leading-tight max-w-5xl"
         >
-          Secure your infrastructure with <br className="hidden md:block" />
+          Secure your infrastructure with{' '}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-cyan to-blue-500">
             Intelligent Automation
           </span>
@@ -189,14 +192,14 @@ export function Landing() {
         >
           <button
             onClick={() => navigate('/login')}
-            className="px-8 py-4 rounded-xl bg-brand-cyan text-brand-darker font-bold text-lg hover:bg-[#00d0dd] transition-all shadow-[0_0_20px_rgba(0,240,255,0.4)] hover:shadow-[0_0_35px_rgba(0,240,255,0.6)] flex items-center gap-2 group"
+            className="px-8 py-4 rounded-xl bg-brand-cyan text-brand-darker font-bold text-lg hover:bg-[#00d0dd] transition-all shadow-[0_0_20px_rgba(0,240,255,0.4)] hover:shadow-[0_0_35px_rgba(0,240,255,0.6)] flex items-center gap-2 group cursor-pointer"
           >
             Enter Dashboard
             <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </button>
           <button
             onClick={() => scrollToSection('about')}
-            className="px-8 py-4 rounded-xl bg-slate-800/80 text-white font-semibold text-lg hover:bg-slate-700 transition-all border border-slate-700 backdrop-blur-md"
+            className="px-8 py-4 rounded-xl bg-slate-800/80 text-white font-semibold text-lg hover:bg-slate-700 transition-all border border-slate-700 backdrop-blur-md cursor-pointer"
           >
             Explore Platform
           </button>
@@ -386,7 +389,11 @@ export function Landing() {
           </div>
 
           <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-slate-500 text-center md:text-left">
-            <p>CyberSentinel AI © {new Date().getFullYear()} - Engineered by <span className="text-white font-medium">Balaji Patil</span></p>
+            <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2">
+              <span>CyberSentinel AI © {new Date().getFullYear()}</span>
+              <span className="hidden sm:inline">-</span>
+              <span>Engineered by <span className="text-white font-medium">Balaji Patil</span></span>
+            </div>
             <div className="flex flex-wrap justify-center gap-4 md:gap-6">
               <button onClick={() => navigate('/privacy-policy')} className="hover:text-white transition-colors cursor-pointer">Privacy Policy</button>
               <button onClick={() => navigate('/terms-of-service')} className="hover:text-white transition-colors cursor-pointer">Terms of Service</button>
@@ -435,7 +442,7 @@ export function Landing() {
 
         <button
           onClick={() => setShowContact(!showContact)}
-          className="w-14 h-14 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center shadow-[0_0_20px_rgba(37,99,235,0.4)] hover:shadow-[0_0_30px_rgba(37,99,235,0.6)] transition-all transform hover:scale-105 active:scale-95"
+          className="w-14 h-14 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center shadow-[0_0_20px_rgba(37,99,235,0.4)] hover:shadow-[0_0_30px_rgba(37,99,235,0.6)] transition-all transform hover:scale-105 active:scale-95 cursor-pointer"
         >
           {showContact ? <ChevronRight className="w-6 h-6 rotate-90" /> : <MessageCircle className="w-7 h-7" />}
         </button>
