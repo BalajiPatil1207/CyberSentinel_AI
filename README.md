@@ -3,8 +3,7 @@
 CyberSentinel AI is a next-generation, AI-powered Enterprise Security Platform built on the MERN stack. It leverages Google's Gemini AI and heuristic analysis to proactively hunt, monitor, and mitigate cyber threats before they breach your perimeter. 
 
 Engineered by **Balaji Patil** ([GitHub Profile](https://github.com/BalajiPatil1207)).
-
-![CyberSentinel AI](Frontend/public/favicon.ico) *Note: Add a hero screenshot here*
+*Note: Add a hero screenshot here*
 
 ## 🌟 Key Features
 
