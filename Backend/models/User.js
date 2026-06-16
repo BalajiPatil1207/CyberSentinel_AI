@@ -45,6 +45,10 @@ const UserSchema = new mongoose.Schema(
       },
       default: "Active",
     },
+    profilePicture: {
+      type: String,
+      default: "",
+    },
     permissions: {
       type: [String],
       default: [],
