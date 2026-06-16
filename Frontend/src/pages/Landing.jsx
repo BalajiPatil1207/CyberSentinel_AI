@@ -105,13 +105,7 @@ export function Landing() {
           </div>
 
           <div className="hidden md:flex items-center gap-4">
-            <button 
-              onClick={() => navigate('/login')}
-              className="text-slate-300 hover:text-white transition-colors font-medium text-sm cursor-pointer"
-            >
-              Sign In
-            </button>
-            <button 
+            <button
               onClick={() => navigate('/login')}
               className="px-5 py-2 rounded-lg bg-brand-cyan text-brand-darker font-semibold text-sm hover:bg-[#00d0dd] transition-all shadow-[0_0_15px_rgba(0,240,255,0.4)] hover:shadow-[0_0_25px_rgba(0,240,255,0.6)] transform hover:-translate-y-0.5 cursor-pointer"
             >
@@ -121,8 +115,8 @@ export function Landing() {
 
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center">
-            <button 
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)} 
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="text-slate-300 hover:text-white cursor-pointer p-2 relative z-50"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -133,7 +127,7 @@ export function Landing() {
         {/* Mobile Menu Dropdown */}
         <AnimatePresence>
           {mobileMenuOpen && (
-            <motion.div 
+            <motion.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
@@ -145,7 +139,6 @@ export function Landing() {
                 <a href="#features" onClick={() => setMobileMenuOpen(false)} className="block w-full text-left text-slate-300 hover:text-brand-cyan font-medium cursor-pointer py-2">Features</a>
                 <a href="#roadmap" onClick={() => setMobileMenuOpen(false)} className="block w-full text-left text-slate-300 hover:text-brand-cyan font-medium cursor-pointer py-2">Roadmap</a>
                 <div className="h-px bg-slate-800 w-full my-2"></div>
-                <button onClick={() => navigate('/login')} className="text-left text-slate-300 hover:text-white font-medium cursor-pointer py-2">Sign In</button>
                 <button onClick={() => navigate('/login')} className="text-center w-full px-5 py-4 rounded-xl bg-brand-cyan text-brand-darker font-bold text-sm shadow-[0_0_15px_rgba(0,240,255,0.4)] cursor-pointer mt-2">Get Started</button>
               </div>
             </motion.div>
@@ -157,6 +150,39 @@ export function Landing() {
 
       {/* Home Hero Section */}
       <main id="home" className="relative z-10 max-w-7xl mx-auto px-8 pt-16 pb-32 flex flex-col items-center text-center min-h-[80vh] justify-center">
+
+        {/* Floating Cyber Particles */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
+          {[...Array(20)].map((_, i) => {
+            const Icon = [Shield, Lock, Server, Activity, Bot, Zap][i % 6];
+            return (
+              <motion.div
+                key={i}
+                className="absolute text-slate-400"
+                initial={{
+                  top: `${Math.random() * 100}%`,
+                  left: `${Math.random() * 100}%`,
+                  scale: Math.random() * 0.5 + 0.5,
+                  opacity: Math.random() * 0.3 + 0.1
+                }}
+                animate={{
+                  y: [0, Math.random() * -150 - 50],
+                  x: [0, (Math.random() - 0.5) * 100],
+                  rotate: [0, Math.random() * 360],
+                  opacity: [0.1, Math.random() * 0.2 + 0.2, 0.1]
+                }}
+                transition={{
+                  duration: Math.random() * 15 + 10,
+                  repeat: Infinity,
+                  ease: "linear"
+                }}
+              >
+                <Icon className="w-6 h-6 md:w-8 md:h-8" />
+              </motion.div>
+            );
+          })}
+        </div>
+
         <motion.div
           initial="hidden"
           animate="visible"
@@ -167,7 +193,7 @@ export function Landing() {
           <span className="text-sm font-medium text-slate-300">Next-Gen Enterprise Security Platform</span>
         </motion.div>
 
-        <motion.h1 
+        <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
@@ -382,7 +408,7 @@ export function Landing() {
                 </li>
                 <li className="flex items-center gap-3">
                   <Mail className="w-5 h-5 text-brand-cyan shrink-0" />
-                  <a href="mailto:balajipatil3252@gmail.com" className="hover:text-white transition-colors cursor-pointer">baalajipatil3252@gmail.com</a>
+                  <a href="mailto:balajipatil3252@gmail.com" className="hover:text-white transition-colors cursor-pointer">balajipatil3252@gmail.com</a>
                 </li>
                 <li className="flex items-center gap-3">
                   <Phone className="w-5 h-5 text-brand-cyan shrink-0" />
