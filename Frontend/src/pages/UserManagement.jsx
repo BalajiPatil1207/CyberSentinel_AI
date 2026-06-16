@@ -14,6 +14,7 @@ export function UserManagement() {
   const [success, setSuccess] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
+  const [userToToggleStatus, setUserToToggleStatus] = useState(null);
 
   // Form states
   const [name, setName] = useState('');
@@ -23,16 +24,19 @@ export function UserManagement() {
   const [mobile, setMobile] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleToggleStatus = async (id, currentStatus) => {
+  const confirmToggleStatus = async () => {
+    if (!userToToggleStatus) return;
     setError('');
     setSuccess('');
-    const res = await toggleUserStatus(id, currentStatus);
+    const res = await toggleUserStatus(userToToggleStatus._id || userToToggleStatus.id, userToToggleStatus.status);
     if (!res.success) {
       setError(res.message || 'Failed to update user status.');
     } else {
       setSuccess('User status updated successfully.');
       setTimeout(() => setSuccess(''), 3000);
+      fetchData();
     }
+    setUserToToggleStatus(null);
   };
 
   const confirmDelete = async () => {
@@ -331,7 +335,7 @@ export function UserManagement() {
                         <Button 
                           variant="ghost" 
                           title={user.status === 'Active' ? 'Deactivate' : 'Activate'}
-                          onClick={() => handleToggleStatus(user._id || user.id, user.status)}
+                          onClick={() => setUserToToggleStatus(user)}
                           className={`p-1.5 h-auto ${user.status === 'Active' ? 'text-slate-400 hover:text-orange-400' : 'text-slate-400 hover:text-green-400'} hover:bg-slate-800/50`}
                         >
                           {user.status === 'Active' ? <XCircle className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}
@@ -375,6 +379,35 @@ export function UserManagement() {
                   </Button>
                   <Button variant="primary" className="flex-1 bg-red-500 hover:bg-red-600 border-0" onClick={confirmDelete}>
                     Yes, Delete
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Toggle Status Confirmation Modal */}
+      {userToToggleStatus && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <Card className="w-full max-w-md bg-slate-900 border-orange-500/30">
+            <CardContent className="pt-6">
+              <div className="flex flex-col items-center text-center space-y-4">
+                <div className="w-12 h-12 rounded-full bg-orange-500/10 flex items-center justify-center text-orange-500">
+                  <AlertTriangle className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white">Change Status?</h3>
+                  <p className="text-sm text-slate-400 mt-1">
+                    Are you sure you want to {userToToggleStatus.status === 'Active' ? 'deactivate' : 'activate'} <span className="text-white font-medium">{userToToggleStatus.name}</span>?
+                  </p>
+                </div>
+                <div className="flex w-full gap-3 mt-4">
+                  <Button variant="outline" className="flex-1" onClick={() => setUserToToggleStatus(null)}>
+                    Cancel
+                  </Button>
+                  <Button variant="primary" className="flex-1 bg-orange-500 hover:bg-orange-600 border-0" onClick={confirmToggleStatus}>
+                    Yes, {userToToggleStatus.status === 'Active' ? 'Deactivate' : 'Activate'}
                   </Button>
                 </div>
               </div>
