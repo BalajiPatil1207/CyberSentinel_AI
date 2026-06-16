@@ -10,26 +10,32 @@ import { cn, Card, CardContent } from '../components/Card';
 import { Button } from '../components/Button';
 
 const navItems = [
-  { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', roles: ['Super Admin', 'Security Analyst'] },
-  { path: '/threat-monitoring', icon: Activity, label: 'Threat Monitoring', roles: ['Super Admin', 'Security Analyst'] },
-  { path: '/phishing-detection', icon: ShieldAlert, label: 'Phishing Detection', roles: ['Super Admin', 'Security Analyst', 'Employee'] },
-  { path: '/malware-analysis', icon: Search, label: 'Malware Analysis', roles: ['Super Admin', 'Security Analyst'] },
-  { path: '/vulnerability-scanner', icon: Shield, label: 'Vulnerability Scanner', roles: ['Super Admin', 'Security Analyst'] },
-  { path: '/incident-response', icon: AlertTriangle, label: 'Incident Response', roles: ['Super Admin', 'Security Analyst'] },
-  { path: '/ai-assistant', icon: MessageSquare, label: 'AI Assistant', roles: ['Super Admin', 'Security Analyst', 'Employee'] },
-  { path: '/alerts', icon: Bell, label: 'Alerts', roles: ['Super Admin', 'Security Analyst', 'Employee'] },
-  { path: '/reports', icon: FileText, label: 'Reports', roles: ['Super Admin', 'Security Analyst'] },
-  { path: '/users', icon: Users, label: 'User Management', roles: ['Super Admin'] },
-  { path: '/settings', icon: Settings, label: 'Settings', roles: ['Super Admin', 'Security Analyst', 'Employee'] },
+  { id: 'dashboard', path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', roles: ['Super Admin', 'Security Analyst'] },
+  { id: 'threat-monitoring', path: '/threat-monitoring', icon: Activity, label: 'Threat Monitoring', roles: ['Super Admin', 'Security Analyst'] },
+  { id: 'phishing-detection', path: '/phishing-detection', icon: ShieldAlert, label: 'Phishing Detection', roles: ['Super Admin', 'Security Analyst', 'Employee'] },
+  { id: 'malware-analysis', path: '/malware-analysis', icon: Search, label: 'Malware Analysis', roles: ['Super Admin', 'Security Analyst'] },
+  { id: 'vulnerability-scanner', path: '/vulnerability-scanner', icon: Shield, label: 'Vulnerability Scanner', roles: ['Super Admin', 'Security Analyst'] },
+  { id: 'incident-response', path: '/incident-response', icon: AlertTriangle, label: 'Incident Response', roles: ['Super Admin', 'Security Analyst'] },
+  { id: 'ai-assistant', path: '/ai-assistant', icon: MessageSquare, label: 'AI Assistant', roles: ['Super Admin', 'Security Analyst', 'Employee'] },
+  { id: 'alerts', path: '/alerts', icon: Bell, label: 'Alerts', roles: ['Super Admin', 'Security Analyst', 'Employee'] },
+  { id: 'reports', path: '/reports', icon: FileText, label: 'Reports', roles: ['Super Admin', 'Security Analyst'] },
+  { id: 'users', path: '/users', icon: Users, label: 'User Management', roles: ['Super Admin'] },
+  { id: 'settings', path: '/settings', icon: Settings, label: 'Settings', roles: ['Super Admin', 'Security Analyst', 'Employee'] },
 ];
 
 export function Sidebar() {
   const { user, logout } = useAuth();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
-  const filteredNavItems = navItems.filter(
-    (item) => !item.roles || (user && item.roles.includes(user.role))
-  );
+  const filteredNavItems = navItems.filter((item) => {
+    if (!user) return false;
+    // If user has specific permissions defined, those override the base role access
+    if (user.permissions && user.permissions.length > 0) {
+      return user.permissions.includes(item.id);
+    }
+    // Otherwise fallback to role-based access
+    return !item.roles || item.roles.includes(user.role);
+  });
 
   const handleLogout = () => {
     setShowLogoutConfirm(false);
