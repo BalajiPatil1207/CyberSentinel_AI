@@ -3,19 +3,33 @@ import { useData } from '../context/DataContext';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/Card';
 import { Badge } from '../components/Badge';
 import { Input } from '../components/Input';
+import { Pagination } from '../components/Pagination';
 import { Search, Filter, ShieldAlert, X } from 'lucide-react';
 import { Button } from '../components/Button';
 
 export function ThreatMonitoring() {
   const { threats } = useData();
   const [searchTerm, setSearchTerm] = useState('');
+  const [filterSeverity, setFilterSeverity] = useState('All');
   const [selectedThreat, setSelectedThreat] = useState(null);
 
-  const filteredThreats = threats.filter(t => 
-    (t._id || t.id).toLowerCase().includes(searchTerm.toLowerCase()) || 
-    t.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    t.source.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredThreats = threats.filter(t => {
+    const matchesSearch = (t._id || t.id).toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          t.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          t.source.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSeverity = filterSeverity === 'All' || t.severity === filterSeverity;
+    return matchesSearch && matchesSeverity;
+  });
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 30;
+  const totalPages = Math.ceil(filteredThreats.length / ITEMS_PER_PAGE);
+  const paginatedThreats = filteredThreats.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterSeverity]);
 
   return (
     <div className="space-y-6">
@@ -39,15 +53,22 @@ export function ThreatMonitoring() {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <Button variant="outline" className="h-9 px-3">
-              <Filter className="w-4 h-4 mr-2" />
-              Filter
-            </Button>
+            <select 
+              className="h-9 px-3 bg-slate-900 border border-slate-700 rounded-md text-sm text-slate-300 focus:ring-brand-cyan focus:border-brand-cyan outline-none cursor-pointer"
+              value={filterSeverity}
+              onChange={(e) => setFilterSeverity(e.target.value)}
+            >
+              <option value="All">All Severities</option>
+              <option value="Critical">Critical</option>
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
+            </select>
           </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {filteredThreats.map((threat) => (
+            {paginatedThreats.map((threat) => (
               <div 
                 key={threat._id || threat.id} 
                 className="flex items-center justify-between p-4 rounded-xl border border-slate-800 bg-slate-900/30 hover:bg-slate-800/50 transition-colors cursor-pointer"
@@ -94,6 +115,13 @@ export function ThreatMonitoring() {
                 No threats found matching your search.
               </div>
             )}
+          </div>
+          <div className="mt-4 pt-4 border-t border-slate-800">
+            <Pagination 
+              currentPage={currentPage} 
+              totalPages={totalPages} 
+              onPageChange={setCurrentPage} 
+            />
           </div>
         </CardContent>
       </Card>
