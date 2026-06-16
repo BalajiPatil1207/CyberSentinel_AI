@@ -4,7 +4,7 @@ CyberSentinel AI is a next-generation, AI-powered Enterprise Security Platform b
 
 Engineered by **Balaji Patil** ([GitHub Profile](https://github.com/BalajiPatil1207)).
 
-![CyberSentinel AI](Frontend/public/favicon.ico) *Note: Add a hero screenshot here*
+![CyberSentinel AI](Frontend/public/favicon.ico)
 
 ## 🌟 Key Features
 
