@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/Card';
 import { Button } from '../components/Button';
-import { Mail, Link as LinkIcon, ShieldCheck, ShieldAlert, ChevronRight } from 'lucide-react';
+import { Mail, Link as LinkIcon, ShieldCheck, ShieldAlert, ChevronRight, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useData } from '../context/DataContext';
 
@@ -114,12 +114,34 @@ export function PhishingDetection() {
 
             {result && !scanning && (
               <div className="space-y-6">
-                <div className={`p-6 rounded-xl border ${result.isMalicious ? 'bg-red-500/10 border-red-500/20' : 'bg-green-500/10 border-green-500/20'} flex items-center justify-between`}>
+                <div className={`p-6 rounded-xl border flex items-center justify-between ${
+                  result.classification === 'High Risk' 
+                    ? 'bg-red-500/10 border-red-500/20' 
+                    : result.classification === 'Suspicious'
+                    ? 'bg-orange-500/10 border-orange-500/20'
+                    : 'bg-green-500/10 border-green-500/20'
+                }`}>
                   <div className="flex items-center gap-4">
-                    {result.isMalicious ? <ShieldAlert className="w-12 h-12 text-red-400" /> : <ShieldCheck className="w-12 h-12 text-green-400" />}
+                    {result.classification === 'High Risk' ? (
+                      <ShieldAlert className="w-12 h-12 text-red-400" />
+                    ) : result.classification === 'Suspicious' ? (
+                      <AlertTriangle className="w-12 h-12 text-orange-400" />
+                    ) : (
+                      <ShieldCheck className="w-12 h-12 text-green-400" />
+                    )}
                     <div>
-                      <h3 className={`text-xl font-bold ${result.isMalicious ? 'text-red-400' : 'text-green-400'}`}>
-                        {result.isMalicious ? 'High Risk Detected' : 'Safe Content'}
+                      <h3 className={`text-xl font-bold ${
+                        result.classification === 'High Risk' 
+                          ? 'text-red-400' 
+                          : result.classification === 'Suspicious'
+                          ? 'text-orange-400'
+                          : 'text-green-400'
+                      }`}>
+                        {result.classification === 'High Risk' 
+                          ? 'High Risk Detected' 
+                          : result.classification === 'Suspicious'
+                          ? 'Suspicious Content'
+                          : 'Safe Content'}
                       </h3>
                       <p className="text-slate-350 font-medium mt-1">AI Threat Score: {result.score}/100</p>
                     </div>
@@ -137,7 +159,7 @@ export function PhishingDetection() {
                     ))}
                   </ul>
 
-                  {result.isMalicious && (
+                  {(result.classification === 'High Risk' || result.classification === 'Suspicious') && (
                     <div className="pt-4 border-t border-slate-800">
                       <h4 className="text-sm font-medium text-slate-400 mb-3">Recommended Actions</h4>
                       <div className="flex gap-3">
