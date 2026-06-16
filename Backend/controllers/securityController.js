@@ -7,6 +7,36 @@ import { sendSuccess } from "../utils/apiResponse.js";
 import { saveRAMFiles } from "../middlewares/memoryUpload.js";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
+// Helper to calculate Levenshtein distance between two strings
+const getLevenshteinDistance = (a, b) => {
+  if (a.length === 0) return b.length;
+  if (b.length === 0) return a.length;
+
+  const matrix = [];
+  for (let i = 0; i <= b.length; i++) {
+    matrix[i] = [i];
+  }
+  for (let j = 0; j <= a.length; j++) {
+    matrix[0][j] = j;
+  }
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b.charAt(i - 1) == a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1, // substitution
+          Math.min(
+            matrix[i][j - 1] + 1,   // insertion
+            matrix[i - 1][j] + 1    // deletion
+          )
+        );
+      }
+    }
+  }
+  return matrix[b.length][a.length];
+};
+
 /**
  * @desc    Scan email content or links for phishing indicators
  * @route   POST /api/security/phishing-scan
@@ -49,6 +79,42 @@ const runPhishingScan = async (req, res, next) => {
 
     // Heuristic 2: Suspicious domains/link redirects
     if (type === "url") {
+      // Parse Protocol and Domain
+      let protocol = "";
+      let domain = "";
+      
+      const urlMatch = textToAnalyze.match(/^([a-z]+):\/\/([^\/]+)/i);
+      if (urlMatch) {
+        protocol = urlMatch[1].toLowerCase();
+        domain = urlMatch[2].toLowerCase();
+      } else {
+        // Fallback if no protocol exists
+        domain = textToAnalyze.split('/')[0].toLowerCase();
+      }
+
+      // Check for valid protocol
+      if (protocol !== "http" && protocol !== "https") {
+        score += 40;
+        details.push("Invalid or unsupported URL protocol detected.");
+      }
+
+      // Typo-Squatting Detection
+      const popularDomains = [
+        "github.com", "google.com", "microsoft.com", "apple.com", "amazon.com", 
+        "facebook.com", "twitter.com", "linkedin.com", "paypal.com", "netflix.com", 
+        "bankofamerica.com", "chase.com"
+      ];
+
+      for (const pop of popularDomains) {
+        const dist = getLevenshteinDistance(domain, pop);
+        if (dist > 0 && dist <= 2) {
+          score += 40;
+          details.push(`Possible typo-squatting domain detected (${domain} resembles ${pop}).`);
+          break; // Avoid multiple typo findings for one domain
+        }
+      }
+
+      // Check for suspicious URL keywords
       const suspiciousDomains = [
         "secure-login",
         "update-account",
@@ -66,11 +132,6 @@ const runPhishingScan = async (req, res, next) => {
       if (isSuspiciousDomain) {
         score += 35;
         details.push("Suspicious domain keywords detected inside the URL string.");
-      }
-
-      if (!textToAnalyze.startsWith("https://")) {
-        score += 15;
-        details.push("Non-secure URL protocol detected (HTTP instead of HTTPS).");
       }
     } else {
       // Email-specific heuristic: Sender domain mismatch signs
@@ -94,8 +155,16 @@ const runPhishingScan = async (req, res, next) => {
     // Cap score at 100
     score = Math.min(score, 100);
     const isMalicious = score >= 70;
+    
+    // Result Classification
+    let classification = "Safe";
+    if (score >= 70) {
+      classification = "High Risk";
+    } else if (score >= 40) {
+      classification = "Suspicious";
+    }
 
-    if (!isMalicious && details.length === 0) {
+    if (classification === "Safe" && details.length === 0) {
       details.push("No obvious phishing signatures identified in source text.");
     }
 
@@ -134,6 +203,7 @@ const runPhishingScan = async (req, res, next) => {
     const report = {
       score,
       isMalicious,
+      classification,
       details,
     };
 
