@@ -16,6 +16,20 @@ export function PhishingDetection() {
 
   const handleScan = async () => {
     if (!content.trim()) return;
+
+    if (type === 'url') {
+      const urlRegex = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+      if (!urlRegex.test(content.trim())) {
+        setError('Please enter a valid URL or link.');
+        return;
+      }
+    } else if (type === 'email') {
+      if (content.trim().length < 15) {
+        setError('Email content is too short for analysis. Please provide more text.');
+        return;
+      }
+    }
+
     setScanning(true);
     setResult(null);
     setError('');
