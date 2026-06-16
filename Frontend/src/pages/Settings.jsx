@@ -1,10 +1,79 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/Card';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { Save } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { useAuth } from '../context/AuthContext';
 
 export function Settings() {
+  const { getAuthHeaders } = useAuth();
+  const [companyName, setCompanyName] = useState('ABC Corporation');
+  const [supportEmail, setSupportEmail] = useState('security@abccybershield.com');
+  const [require2FA, setRequire2FA] = useState(true);
+  const [autoBlockIPs, setAutoBlockIPs] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await fetch('/api/settings', {
+          headers: { ...getAuthHeaders() }
+        });
+        const result = await response.json();
+        if (response.ok && result.success) {
+          const s = result.data;
+          if (s) {
+            setCompanyName(s.companyName);
+            setSupportEmail(s.supportEmail);
+            setRequire2FA(s.require2FA);
+            setAutoBlockIPs(s.autoBlockIPs);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch settings:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchSettings();
+  }, []);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const response = await fetch('/api/settings', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders()
+        },
+        body: JSON.stringify({
+          companyName,
+          supportEmail,
+          require2FA,
+          autoBlockIPs
+        })
+      });
+      const result = await response.json();
+      if (response.ok && result.success) {
+        toast.success('Settings updated successfully!');
+      } else {
+        toast.error(result.message || 'Failed to update settings');
+      }
+    } catch (error) {
+      console.error('Failed to save settings:', error);
+      toast.error('Network error. Failed to save settings.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (isLoading) {
+    return <div className="text-slate-400">Loading settings...</div>;
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -20,14 +89,20 @@ export function Settings() {
           <CardContent className="space-y-4">
             <div>
               <label className="text-sm font-medium text-slate-400 mb-1 block">Company Name</label>
-              <Input defaultValue="ABC Corporation" />
+              <Input 
+                value={companyName} 
+                onChange={(e) => setCompanyName(e.target.value)} 
+              />
             </div>
             <div>
               <label className="text-sm font-medium text-slate-400 mb-1 block">Support Email</label>
-              <Input defaultValue="security@abccybershield.com" />
+              <Input 
+                value={supportEmail} 
+                onChange={(e) => setSupportEmail(e.target.value)} 
+              />
             </div>
-            <Button variant="primary" className="mt-4">
-              <Save className="w-4 h-4 mr-2" /> Save Changes
+            <Button variant="primary" className="mt-4" onClick={handleSave} disabled={isSaving}>
+              <Save className="w-4 h-4 mr-2" /> {isSaving ? 'Saving...' : 'Save Changes'}
             </Button>
           </CardContent>
         </Card>
@@ -43,7 +118,12 @@ export function Settings() {
                 <p className="text-xs text-slate-500">Require 2FA for all administrative accounts.</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" className="sr-only peer" defaultChecked />
+                <input 
+                  type="checkbox" 
+                  className="sr-only peer" 
+                  checked={require2FA} 
+                  onChange={(e) => setRequire2FA(e.target.checked)} 
+                />
                 <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-cyan"></div>
               </label>
             </div>
@@ -54,12 +134,17 @@ export function Settings() {
                 <p className="text-xs text-slate-500">Automatically block IPs with Threat Score {'>'} 90.</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" className="sr-only peer" defaultChecked />
+                <input 
+                  type="checkbox" 
+                  className="sr-only peer" 
+                  checked={autoBlockIPs} 
+                  onChange={(e) => setAutoBlockIPs(e.target.checked)} 
+                />
                 <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-cyan"></div>
               </label>
             </div>
-            <Button variant="primary" className="mt-4">
-              <Save className="w-4 h-4 mr-2" /> Update Policies
+            <Button variant="primary" className="mt-4" onClick={handleSave} disabled={isSaving}>
+              <Save className="w-4 h-4 mr-2" /> {isSaving ? 'Updating...' : 'Update Policies'}
             </Button>
           </CardContent>
         </Card>
