@@ -14,7 +14,7 @@ export function IncidentResponse() {
   
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 30;
+  const ITEMS_PER_PAGE = 5;
   const totalPages = Math.ceil(incidents.length / ITEMS_PER_PAGE);
   const paginatedIncidents = incidents.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
