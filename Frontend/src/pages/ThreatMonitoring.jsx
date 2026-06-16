@@ -79,7 +79,7 @@ export function ThreatMonitoring() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="text-sm text-slate-400">{new Date(threat.timestamp || threat.createdAt).toLocaleString()}</span>
+                  <span className="text-sm text-slate-400">{new Date(threat.timestamp || threat.createdAt).toLocaleString([], { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })}</span>
                   <div className="mt-2">
                     <Badge variant={threat.status === 'Active' ? 'destructive' : 'success'}>
                       {threat.status}
@@ -144,7 +144,7 @@ export function ThreatMonitoring() {
                     <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded border border-slate-800 bg-slate-900/50">
                       <div className="flex items-center justify-between mb-1">
                         <div className="font-bold text-slate-200">Threat Detected</div>
-                        <time className="text-xs text-slate-500">{new Date(selectedThreat.timestamp || selectedThreat.createdAt).toLocaleTimeString()}</time>
+                        <time className="text-xs text-slate-500">{new Date(selectedThreat.timestamp || selectedThreat.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</time>
                       </div>
                       <div className="text-slate-400 text-sm">System flagged anomalous activity from threat feed.</div>
                     </div>
