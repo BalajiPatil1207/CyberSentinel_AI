@@ -1,3 +1,7 @@
+/*
+ Author: Balaji Patil
+ GitHub: github.com/BalajiPatil1207
+*/
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
