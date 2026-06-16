@@ -6,6 +6,9 @@ import { MainLayout } from './layouts/MainLayout';
 
 // Pages
 import { Landing } from './pages/Landing';
+import { PrivacyPolicy } from './pages/PrivacyPolicy';
+import { TermsOfService } from './pages/TermsOfService';
+import { CookiePolicy } from './pages/CookiePolicy';
 import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { ThreatMonitoring } from './pages/ThreatMonitoring';
@@ -51,6 +54,9 @@ function App() {
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Landing />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
+            <Route path="/cookie-policy" element={<CookiePolicy />} />
             <Route path="/login" element={<Login />} />
             
             {/* Protected App Routes wrapped in MainLayout */}
