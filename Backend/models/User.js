@@ -20,6 +20,10 @@ const UserSchema = new mongoose.Schema(
       ],
       index: true,
     },
+    mobile: {
+      type: String,
+      trim: true,
+    },
     password: {
       type: String,
       required: [true, "Password is required"],
