@@ -26,13 +26,22 @@ import { Alerts } from './pages/Alerts';
 import { Reports } from './pages/Reports';
 import { UserManagement } from './pages/UserManagement';
 import { Settings } from './pages/Settings';
+import { Profile } from './pages/Profile';
+import { Permissions } from './pages/Permissions';
 
 function DashboardRedirect() {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" replace />;
 
+  if (user.role === 'Super Admin') {
+    return <Navigate to="/dashboard" replace />;
+  }
+
   if (user.permissions && user.permissions.length > 0) {
-    return <Navigate to={`/${user.permissions[0]}`} replace />;
+    const validPermission = user.permissions.find(p => p);
+    if (validPermission) {
+      return <Navigate to={`/${validPermission}`} replace />;
+    }
   }
 
   const defaultPath = user.role === 'Employee' ? '/phishing-detection' : '/dashboard';
@@ -47,12 +56,18 @@ function RoleProtectedRoute({ children, allowedRoles, permissionId }) {
     return <Navigate to="/login" replace />;
   }
 
+  // Super Admins bypass specific permission checks
+  if (user.role === 'Super Admin') {
+    return children;
+  }
+
   // If the user has specific module permissions defined, they override the role
   if (user.permissions && user.permissions.length > 0) {
     if (permissionId && user.permissions.includes(permissionId)) {
       return children;
     } else {
-      const defaultPath = `/${user.permissions[0]}`;
+      const validPermission = user.permissions.find(p => p);
+      const defaultPath = validPermission ? `/${validPermission}` : (user.role === 'Employee' ? '/phishing-detection' : '/dashboard');
       return <Navigate to={defaultPath} replace />;
     }
   }
@@ -154,10 +169,22 @@ function App() {
                   <UserManagement />
                 </RoleProtectedRoute>
               } />
+
+              <Route path="permissions" element={
+                <RoleProtectedRoute allowedRoles={['Super Admin']} permissionId="permissions">
+                  <Permissions />
+                </RoleProtectedRoute>
+              } />
               
               <Route path="settings" element={
                 <RoleProtectedRoute allowedRoles={['Super Admin', 'Security Analyst', 'Employee']} permissionId="settings">
                   <Settings />
+                </RoleProtectedRoute>
+              } />
+
+              <Route path="profile" element={
+                <RoleProtectedRoute allowedRoles={['Super Admin', 'Security Analyst', 'Employee']}>
+                  <Profile />
                 </RoleProtectedRoute>
               } />
             </Route>
