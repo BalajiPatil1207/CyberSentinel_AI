@@ -52,7 +52,7 @@ export function Topbar() {
                   View All
                 </button>
               </div>
-              <div className="max-h-80 overflow-y-auto">
+              <div className="max-h-80 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-slate-900 [&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-slate-600">
                 {unreadAlertsList.length === 0 ? (
                   <div className="p-4 text-center text-sm text-slate-500">
                     No new notifications
