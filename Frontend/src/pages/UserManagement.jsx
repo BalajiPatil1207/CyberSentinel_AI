@@ -201,12 +201,12 @@ export function UserManagement() {
 
   return (
     <div className="space-y-6 relative">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white">User Management</h1>
           <p className="text-slate-400 text-sm mt-1">Manage platform access and role permissions.</p>
         </div>
-        <Button variant="primary" onClick={() => setShowAddForm(!showAddForm)}>
+        <Button variant="primary" onClick={() => setShowAddForm(!showAddForm)} className="w-full sm:w-auto">
           <UserPlus className="w-4 h-4 mr-2" />
           {showAddForm ? 'Cancel' : 'Add User'}
         </Button>
@@ -337,9 +337,9 @@ export function UserManagement() {
           <CardTitle>System Users</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left">
-              <thead className="text-xs text-slate-400 uppercase bg-slate-800/50">
+          <div className="overflow-x-hidden md:overflow-x-auto">
+            <table className="w-full text-sm text-left block md:table">
+              <thead className="hidden md:table-header-group text-xs text-slate-400 uppercase bg-slate-800/50">
                 <tr>
                   <th className="px-4 py-3 rounded-tl-lg w-16 text-center">Sr. No.</th>
                   <th className="px-4 py-3">User</th>
@@ -349,32 +349,38 @@ export function UserManagement() {
                   <th className="px-4 py-3 rounded-tr-lg text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="block md:table-row-group">
                 {paginatedUsers.map((user, index) => (
-                  <tr key={user._id || user.id} className="border-b border-slate-800 hover:bg-slate-800/30 transition-colors">
-                    <td className="px-4 py-4 text-center text-slate-400 font-medium">
-                      {(currentPage - 1) * ITEMS_PER_PAGE + index + 1}
+                  <tr key={user._id || user.id} className="block md:table-row border border-slate-700 md:border-0 md:border-b border-slate-800 hover:bg-slate-800/30 bg-slate-900/50 md:bg-transparent rounded-xl mb-4 md:mb-0 p-4 md:p-0 transition-colors">
+                    <td className="flex justify-between items-center md:table-cell px-2 md:px-4 py-2 md:py-4 text-slate-400 font-medium border-b border-slate-800 md:border-0">
+                      <span className="md:hidden text-xs uppercase font-bold text-slate-500">Sr. No.</span>
+                      <span className="text-center md:text-left w-full md:w-auto">{(currentPage - 1) * ITEMS_PER_PAGE + index + 1}</span>
                     </td>
-                    <td className="px-4 py-4">
-                      <div>
+                    <td className="flex justify-between items-center md:table-cell px-2 md:px-4 py-2 md:py-4 border-b border-slate-800 md:border-0">
+                      <span className="md:hidden text-xs uppercase font-bold text-slate-500">User</span>
+                      <div className="text-right md:text-left">
                         <p className="font-medium text-white">{user.name}</p>
                         <p className="text-xs text-slate-500">{user.email}</p>
                       </div>
                     </td>
-                    <td className="px-4 py-4">
+                    <td className="flex justify-between items-center md:table-cell px-2 md:px-4 py-2 md:py-4 border-b border-slate-800 md:border-0">
+                      <span className="md:hidden text-xs uppercase font-bold text-slate-500">Role</span>
                       <Badge variant={user.role === 'Super Admin' ? 'purple' : user.role === 'Security Analyst' ? 'info' : 'default'}>
                         {user.role}
                       </Badge>
                     </td>
-                    <td className="px-4 py-4 text-sm text-slate-300">
+                    <td className="flex justify-between items-center md:table-cell px-2 md:px-4 py-2 md:py-4 text-sm text-slate-300 border-b border-slate-800 md:border-0">
+                      <span className="md:hidden text-xs uppercase font-bold text-slate-500">Mobile</span>
                       {user.mobile || '-'}
                     </td>
-                    <td className="px-4 py-4">
+                    <td className="flex justify-between items-center md:table-cell px-2 md:px-4 py-2 md:py-4 border-b border-slate-800 md:border-0">
+                      <span className="md:hidden text-xs uppercase font-bold text-slate-500">Status</span>
                       <Badge variant={user.status === 'Active' ? 'success' : 'destructive'}>
                         {user.status}
                       </Badge>
                     </td>
-                    <td className="px-4 py-4 text-right">
+                    <td className="flex justify-between items-center md:table-cell px-2 md:px-4 py-3 md:py-4 md:text-right">
+                      <span className="md:hidden text-xs uppercase font-bold text-slate-500">Actions</span>
                       <div className="flex justify-end gap-1">
                         <Button 
                           variant="ghost" 
