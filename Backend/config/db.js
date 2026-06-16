@@ -23,7 +23,7 @@ const connectDB = async () => {
       await User.create({
         name: "Super Admin",
         email: adminEmail,
-        password: "P@tilcybershild1207",
+        password: "P@tilcybershield1207",
         role: "Super Admin",
         status: "Active",
       });
