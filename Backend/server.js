@@ -17,6 +17,7 @@ import securityRoutes from "./routes/securityRoutes.js";
 import alertRoutes from "./routes/alertRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
+import uploadRoutes from "./routes/uploadRoutes.js";
 
 // Load environment variables
 dotenv.config();
@@ -77,6 +78,7 @@ app.use("/api/security", securityRoutes);
 app.use("/api/alerts", alertRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/reports", reportRoutes);
+app.use("/api/upload", uploadRoutes);
 
 // Root route (Health check)
 app.get("/", (req, res) => {
