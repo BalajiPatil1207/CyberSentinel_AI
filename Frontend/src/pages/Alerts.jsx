@@ -58,7 +58,7 @@ export function Alerts() {
                       <p className={`text-sm ${alert.isRead ? 'text-slate-400' : 'text-slate-200 font-medium'}`}>
                         {alert.message}
                       </p>
-                      <p className="text-xs text-slate-500 mt-2">{new Date(alert.timestamp || alert.createdAt).toLocaleString()}</p>
+                      <p className="text-xs text-slate-500 mt-2">{new Date(alert.timestamp || alert.createdAt).toLocaleString([], { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })}</p>
                     </div>
                   </div>
                   {!alert.isRead && (
