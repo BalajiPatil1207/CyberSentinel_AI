@@ -285,7 +285,8 @@ export function UserManagement() {
             <table className="w-full text-sm text-left">
               <thead className="text-xs text-slate-400 uppercase bg-slate-800/50">
                 <tr>
-                  <th className="px-4 py-3 rounded-tl-lg">User</th>
+                  <th className="px-4 py-3 rounded-tl-lg w-16 text-center">Sr. No.</th>
+                  <th className="px-4 py-3">User</th>
                   <th className="px-4 py-3">Role</th>
                   <th className="px-4 py-3">Mobile</th>
                   <th className="px-4 py-3">Status</th>
@@ -293,8 +294,11 @@ export function UserManagement() {
                 </tr>
               </thead>
               <tbody>
-                {users.map((user) => (
+                {users.map((user, index) => (
                   <tr key={user._id || user.id} className="border-b border-slate-800 hover:bg-slate-800/30 transition-colors">
+                    <td className="px-4 py-4 text-center text-slate-400 font-medium">
+                      {index + 1}
+                    </td>
                     <td className="px-4 py-4">
                       <div>
                         <p className="font-medium text-white">{user.name}</p>
