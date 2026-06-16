@@ -64,8 +64,9 @@ export const DataProvider = ({ children }) => {
     if (!user) return;
 
     // Connect to server socket
-    const socket = io(window.location.origin, {
-      transports: ["websocket"],
+    const socketUrl = import.meta.env.DEV ? "http://localhost:5000" : window.location.origin;
+    const socket = io(socketUrl, {
+      transports: ["polling", "websocket"],
       autoConnect: true,
     });
 
