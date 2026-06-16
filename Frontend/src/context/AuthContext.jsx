@@ -112,6 +112,38 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateProfile = async (name, email) => {
+    try {
+      const response = await fetch("/api/auth/profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeaders(),
+        },
+        body: JSON.stringify({ name, email }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        setUser(result.data);
+        localStorage.setItem("auth_user", JSON.stringify(result.data));
+        return { success: true };
+      } else {
+        return { 
+          success: false, 
+          message: result.message || "Profile update failed." 
+        };
+      }
+    } catch (error) {
+      console.error("Profile update API request failed:", error);
+      return { 
+        success: false, 
+        message: "Network error. Unable to connect to server." 
+      };
+    }
+  };
+
   const logout = () => {
     setUser(null);
     localStorage.removeItem("auth_token");
@@ -119,7 +151,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading, getAuthHeaders }}>
+    <AuthContext.Provider value={{ user, login, register, logout, loading, getAuthHeaders, updateProfile }}>
       {!loading && children}
     </AuthContext.Provider>
   );
