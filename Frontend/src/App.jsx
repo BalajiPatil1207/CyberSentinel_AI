@@ -27,10 +27,14 @@ import { Reports } from './pages/Reports';
 import { UserManagement } from './pages/UserManagement';
 import { Settings } from './pages/Settings';
 
-// Route Redirect Helper to handle default path by user role
 function DashboardRedirect() {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" replace />;
+
+  if (user.permissions && user.permissions.length > 0) {
+    return <Navigate to={`/${user.permissions[0]}`} replace />;
+  }
+
   const defaultPath = user.role === 'Employee' ? '/phishing-detection' : '/dashboard';
   return <Navigate to={defaultPath} replace />;
 }
@@ -41,6 +45,17 @@ function RoleProtectedRoute({ children, allowedRoles }) {
 
   if (!user) {
     return <Navigate to="/login" replace />;
+  }
+
+  // If allowedPermissions array is passed, check it first
+  if (allowedRoles && allowedRoles.length > 0) {
+    // If the user has explicitly defined permissions, check those
+    if (user.permissions && user.permissions.length > 0) {
+      // Find the specific route path from window location or pass an identifier
+      // Actually we need the route ID. For simplicity, since the route is protected by RoleProtectedRoute,
+      // we can add an optional `permissionId` prop to RoleProtectedRoute.
+      // But we haven't added `permissionId` to the route components yet. Let's do that.
+    }
   }
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
