@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { DataProvider } from './context/DataContext';
 import { MainLayout } from './layouts/MainLayout';
+import { Toaster } from 'react-hot-toast';
 
 // Pages
 import { Landing } from './pages/Landing';
@@ -53,6 +54,19 @@ function RoleProtectedRoute({ children, allowedRoles }) {
 function App() {
   return (
     <Router>
+      <Toaster position="top-right" toastOptions={{
+        style: {
+          background: '#1e293b',
+          color: '#fff',
+          border: '1px solid rgba(6, 182, 212, 0.2)',
+        },
+        success: {
+          iconTheme: {
+            primary: '#10b981',
+            secondary: '#fff',
+          },
+        },
+      }} />
       <AuthProvider>
         <DataProvider>
           <Routes>
