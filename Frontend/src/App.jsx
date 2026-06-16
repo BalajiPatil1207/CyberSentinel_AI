@@ -5,6 +5,7 @@ import { DataProvider } from './context/DataContext';
 import { MainLayout } from './layouts/MainLayout';
 
 // Pages
+import { Landing } from './pages/Landing';
 import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { ThreatMonitoring } from './pages/ThreatMonitoring';
@@ -48,12 +49,15 @@ function App() {
       <AuthProvider>
         <DataProvider>
           <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
             
-            <Route path="/" element={<MainLayout />}>
-              <Route index element={<DashboardRedirect />} />
+            {/* Protected App Routes wrapped in MainLayout */}
+            <Route element={<MainLayout />}>
+              <Route path="/app" element={<DashboardRedirect />} />
               
-              <Route path="dashboard" element={
+              <Route path="/dashboard" element={
                 <RoleProtectedRoute allowedRoles={['Super Admin', 'Security Analyst']}>
                   <Dashboard />
                 </RoleProtectedRoute>
