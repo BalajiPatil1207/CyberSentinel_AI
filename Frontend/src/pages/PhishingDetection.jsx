@@ -177,7 +177,13 @@ export function PhishingDetection() {
                     <div className="pt-4 border-t border-slate-800">
                       <h4 className="text-sm font-medium text-slate-400 mb-3">Recommended Actions</h4>
                       <div className="flex gap-3">
-                        <Button variant="outline" className="text-red-450 border-red-900/50 hover:bg-red-900/25">Block Indicator</Button>
+                        <Button 
+                          variant="outline" 
+                          className="text-red-450 border-red-900/50 hover:bg-red-900/25"
+                          onClick={() => toast.success('Indicator blocked successfully!')}
+                        >
+                          Block Indicator
+                        </Button>
                         <Button variant="primary" onClick={() => window.location.href = '/incident-response'}>Create Incident Ticket</Button>
                       </div>
                     </div>
