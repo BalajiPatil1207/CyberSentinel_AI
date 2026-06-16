@@ -1,25 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useData } from '../context/DataContext';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/Card';
 import { Shield, AlertTriangle, ShieldAlert, Activity, Bug, Lock } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-
-const data = [
-  { name: 'Mon', attacks: 400 },
-  { name: 'Tue', attacks: 300 },
-  { name: 'Wed', attacks: 550 },
-  { name: 'Thu', attacks: 450 },
-  { name: 'Fri', attacks: 700 },
-  { name: 'Sat', attacks: 200 },
-  { name: 'Sun', attacks: 350 },
-];
-
-const pieData = [
-  { name: 'Phishing', value: 400 },
-  { name: 'Malware', value: 300 },
-  { name: 'DDoS', value: 300 },
-  { name: 'Insider', value: 200 },
-];
 
 const COLORS = ['#00f0ff', '#0052ff', '#b500ff', '#f43f5e'];
 
@@ -46,6 +29,56 @@ function StatCard({ title, value, icon: Icon, trend, colorClass }) {
 
 export function Dashboard() {
   const { threats, incidents, vulnerabilities } = useData();
+
+  const dynamicTrendData = useMemo(() => {
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const trendMap = {};
+    
+    // Initialize last 7 days with 0 attacks
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dayName = days[d.getDay()];
+      trendMap[dayName] = 0;
+    }
+
+    // Populate with real data
+    const now = new Date();
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    
+    threats.forEach(threat => {
+      const date = new Date(threat.timestamp || threat.createdAt);
+      if (date >= sevenDaysAgo) {
+        const dayName = days[date.getDay()];
+        if (trendMap[dayName] !== undefined) {
+          trendMap[dayName]++;
+        }
+      }
+    });
+
+    // Format for Recharts, respecting chronological order (from 6 days ago to today)
+    const result = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dayName = days[d.getDay()];
+      result.push({ name: dayName, attacks: trendMap[dayName] });
+    }
+    return result;
+  }, [threats]);
+
+  const dynamicPieData = useMemo(() => {
+    const counts = {};
+    threats.forEach(threat => {
+      const type = threat.type || 'Unknown';
+      counts[type] = (counts[type] || 0) + 1;
+    });
+    
+    return Object.keys(counts).map(key => ({
+      name: key,
+      value: counts[key]
+    })).sort((a, b) => b.value - a.value); // Sort highest first
+  }, [threats]);
 
   return (
     <div className="space-y-6">
@@ -75,7 +108,7 @@ export function Dashboard() {
           <CardContent>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={data}>
+                <AreaChart data={dynamicTrendData}>
                   <defs>
                     <linearGradient id="colorAttacks" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#00f0ff" stopOpacity={0.3}/>
@@ -105,7 +138,7 @@ export function Dashboard() {
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={pieData}
+                    data={dynamicPieData}
                     cx="50%"
                     cy="50%"
                     innerRadius={60}
@@ -114,7 +147,7 @@ export function Dashboard() {
                     dataKey="value"
                     stroke="none"
                   >
-                    {pieData.map((entry, index) => (
+                    {dynamicPieData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
@@ -126,10 +159,10 @@ export function Dashboard() {
               </ResponsiveContainer>
             </div>
             <div className="w-full space-y-2 mt-4">
-              {pieData.map((item, index) => (
+              {dynamicPieData.map((item, index) => (
                 <div key={item.name} className="flex items-center justify-between text-sm">
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index] }}></div>
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
                     <span className="text-slate-300">{item.name}</span>
                   </div>
                   <span className="font-medium text-white">{item.value}</span>
@@ -149,7 +182,8 @@ export function Dashboard() {
             <table className="w-full text-sm text-left">
               <thead className="text-xs text-slate-400 uppercase bg-slate-800/50">
                 <tr>
-                  <th className="px-4 py-3 rounded-tl-lg">Threat ID</th>
+                  <th className="px-4 py-3 rounded-tl-lg">Sr. No.</th>
+                  <th className="px-4 py-3">Threat ID</th>
                   <th className="px-4 py-3">Type</th>
                   <th className="px-4 py-3">Source</th>
                   <th className="px-4 py-3">Severity</th>
@@ -157,8 +191,9 @@ export function Dashboard() {
                 </tr>
               </thead>
               <tbody>
-                {threats.slice(0, 5).map((threat) => (
+                {threats.slice(0, 5).map((threat, index) => (
                   <tr key={threat._id || threat.id} className="border-b border-slate-800 hover:bg-slate-800/30 transition-colors">
+                    <td className="px-4 py-3 text-slate-400">{index + 1}</td>
                     <td className="px-4 py-3 font-medium text-white">{(threat._id || threat.id).substring(0, 8)}</td>
                     <td className="px-4 py-3 text-slate-300">{threat.type}</td>
                     <td className="px-4 py-3 font-mono text-slate-400">{threat.source}</td>
