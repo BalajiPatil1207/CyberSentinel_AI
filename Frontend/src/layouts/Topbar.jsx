@@ -2,15 +2,18 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Bell, UserCircle, Search } from 'lucide-react';
 import { useData } from '../context/DataContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export function Topbar() {
   const { user } = useAuth();
-  const { alerts } = useData();
+  const { alerts, markAlertAsRead } = useData();
   const navigate = useNavigate();
+  const location = useLocation();
   const [showNotifications, setShowNotifications] = useState(false);
   const dropdownRef = useRef(null);
-  const unreadAlerts = alerts.filter(a => !a.isRead).length;
+  
+  const unreadAlertsList = alerts.filter(a => !a.isRead);
+  const unreadAlerts = unreadAlertsList.length;
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -50,18 +53,22 @@ export function Topbar() {
                 </button>
               </div>
               <div className="max-h-80 overflow-y-auto">
-                {alerts.length === 0 ? (
+                {unreadAlertsList.length === 0 ? (
                   <div className="p-4 text-center text-sm text-slate-500">
                     No new notifications
                   </div>
                 ) : (
-                  alerts.slice(0, 5).map(alert => (
+                  unreadAlertsList.slice(0, 5).map(alert => (
                     <div 
                       key={alert._id || alert.id} 
-                      className={`p-3 border-b border-slate-800 hover:bg-slate-800/50 cursor-pointer ${!alert.isRead ? 'bg-slate-800/20' : ''}`}
-                      onClick={() => { setShowNotifications(false); navigate('/alerts'); }}
+                      className="p-3 border-b border-slate-800 bg-slate-800/20 hover:bg-slate-800/50 cursor-pointer"
+                      onClick={() => { 
+                        markAlertAsRead(alert._id || alert.id);
+                        setShowNotifications(false); 
+                        navigate('/alerts'); 
+                      }}
                     >
-                      <p className={`text-sm ${!alert.isRead ? 'text-white' : 'text-slate-400'} line-clamp-2`}>
+                      <p className="text-sm text-white line-clamp-2">
                         {alert.message}
                       </p>
                       <p className="text-[10px] text-slate-500 mt-1">
@@ -76,7 +83,13 @@ export function Topbar() {
         </div>
 
         <button 
-          onClick={() => navigate('/profile')}
+          onClick={() => {
+            if (location.pathname === '/profile') {
+              navigate(-1);
+            } else {
+              navigate('/profile');
+            }
+          }}
           className="flex items-center gap-3 pl-6 border-l border-slate-700 hover:opacity-80 transition-opacity text-left cursor-pointer"
         >
           <div className="text-right">
