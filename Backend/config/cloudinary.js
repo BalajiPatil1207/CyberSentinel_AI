@@ -15,11 +15,10 @@ cloudinary.config({
 // Setup Multer Storage Engine for Cloudinary
 const storage = multerStorageCloudinary({
   cloudinary: cloudinary,
-  params: {
-    folder: "CyberSentinel_AI/uploads",
-    allowed_formats: ["jpg", "jpeg", "png", "webp", "pdf", "docx"], // Adjust allowed formats
-    // format: async (req, file) => "png", // Uncomment to force format
-    public_id: (req, file) => `${Date.now()}-${file.originalname.split(".")[0]}`,
+  folder: "CyberSentinel_AI/uploads",
+  allowedFormats: ["jpg", "jpeg", "png", "webp", "pdf", "docx"],
+  filename: function (req, file, cb) {
+    cb(undefined, `${Date.now()}-${file.originalname.split(".")[0]}`);
   },
 });
 
