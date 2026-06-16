@@ -260,6 +260,48 @@ const editUser = async (req, res, next) => {
   }
 };
 
+/**
+ * @desc    Update user profile
+ * @route   PUT /api/auth/profile
+ * @access  Protected
+ */
+const updateProfile = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      throwNotFound("User not found");
+    }
+
+    user.name = req.body.name || user.name;
+    
+    if (req.body.email && req.body.email !== user.email) {
+      const emailExists = await User.findOne({ email: req.body.email });
+      if (emailExists) {
+        throwBadRequest("Email is already in use by another account.");
+      }
+      user.email = req.body.email;
+    }
+
+    if (req.body.password) {
+      user.password = req.body.password;
+    }
+
+    await user.save();
+
+    return sendSuccess(res, {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      mobile: user.mobile,
+      status: user.status,
+      permissions: user.permissions
+    }, "Profile updated successfully!");
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default {
   register,
   login,
@@ -268,6 +310,7 @@ export default {
   updateUserStatus,
   deleteUser,
   editUser,
+  updateProfile,
 };
 
 export {
@@ -278,4 +321,5 @@ export {
   updateUserStatus,
   deleteUser,
   editUser,
+  updateProfile,
 };
