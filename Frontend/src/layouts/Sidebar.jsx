@@ -9,7 +9,7 @@ import { useAuth } from '../context/AuthContext';
 import { cn, Card, CardContent } from '../components/Card';
 import { Button } from '../components/Button';
 
-const navItems = [
+export const navItems = [
   { id: 'dashboard', path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', roles: ['Super Admin', 'Security Analyst'] },
   { id: 'threat-monitoring', path: '/threat-monitoring', icon: Activity, label: 'Threat Monitoring', roles: ['Super Admin', 'Security Analyst'] },
   { id: 'phishing-detection', path: '/phishing-detection', icon: ShieldAlert, label: 'Phishing Detection', roles: ['Super Admin', 'Security Analyst', 'Employee'] },
@@ -24,11 +24,8 @@ const navItems = [
   { id: 'settings', path: '/settings', icon: Settings, label: 'Settings', roles: ['Super Admin', 'Security Analyst', 'Employee'] },
 ];
 
-export function Sidebar() {
-  const { user, logout } = useAuth();
-  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-
-  const filteredNavItems = navItems.filter((item) => {
+export const getFilteredNavItems = (user) => {
+  return navItems.filter((item) => {
     if (!user) return false;
     
     // Super Admins always see all their allowed role items, ignoring specific restrictions
@@ -43,6 +40,13 @@ export function Sidebar() {
     // Otherwise fallback to role-based access
     return !item.roles || item.roles.includes(user.role);
   });
+};
+
+export function Sidebar() {
+  const { user, logout } = useAuth();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
+  const filteredNavItems = getFilteredNavItems(user);
 
   const handleLogout = () => {
     setShowLogoutConfirm(false);
@@ -51,7 +55,7 @@ export function Sidebar() {
 
   return (
     <>
-      <aside className="w-64 h-screen glass-panel rounded-none border-t-0 border-b-0 border-l-0 fixed left-0 top-0 flex flex-col z-20">
+      <aside className="w-64 h-screen glass-panel rounded-none border-t-0 border-b-0 border-l-0 fixed left-0 top-0 hidden md:flex flex-col z-20">
         <div className="p-6 flex items-center gap-3">
           <Shield className="w-8 h-8 text-brand-cyan" />
           <span className="font-bold text-lg tracking-wide text-white">ABC Cyber Shield</span>
