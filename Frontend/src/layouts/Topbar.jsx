@@ -75,13 +75,16 @@ export function Topbar() {
           )}
         </div>
 
-        <div className="flex items-center gap-3 pl-6 border-l border-slate-700">
+        <button 
+          onClick={() => navigate('/profile')}
+          className="flex items-center gap-3 pl-6 border-l border-slate-700 hover:opacity-80 transition-opacity text-left cursor-pointer"
+        >
           <div className="text-right">
             <p className="text-sm font-medium text-slate-200 leading-none">{user?.name}</p>
             <p className="text-xs text-brand-cyan mt-1">{user?.role}</p>
           </div>
-          <UserCircle className="w-8 h-8 text-slate-400" />
-        </div>
+          <UserCircle className="w-8 h-8 text-slate-400 hover:text-brand-cyan transition-colors" />
+        </button>
       </div>
     </header>
   );
