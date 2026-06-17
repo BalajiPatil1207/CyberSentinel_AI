@@ -19,8 +19,8 @@ export const navItems = [
   { id: 'ai-assistant', path: '/ai-assistant', icon: MessageSquare, label: 'AI Assistant', roles: ['Super Admin', 'Security Analyst', 'Employee'] },
   { id: 'alerts', path: '/alerts', icon: Bell, label: 'Alerts', roles: ['Super Admin', 'Security Analyst', 'Employee'] },
   { id: 'reports', path: '/reports', icon: FileText, label: 'Reports', roles: ['Super Admin', 'Security Analyst'] },
-  { id: 'users', path: '/users', icon: Users, label: 'User Management', roles: ['Super Admin'] },
-  { id: 'permissions', path: '/permissions', icon: Shield, label: 'Permissions', roles: ['Super Admin'] },
+  { id: 'users', path: '/users', icon: Users, label: 'Employees', roles: ['Super Admin'] },
+  { id: 'permissions', path: '/permissions', icon: Shield, label: 'Employee Permissions', roles: ['Super Admin'] },
   { id: 'settings', path: '/settings', icon: Settings, label: 'Settings', roles: ['Super Admin', 'Security Analyst', 'Employee'] },
 ];
 
