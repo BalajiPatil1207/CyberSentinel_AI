@@ -36,10 +36,51 @@ export function Topbar() {
 
   return (
     <header className="h-16 glass-panel rounded-none border-t-0 border-x-0 fixed top-0 right-0 left-0 md:left-64 z-10 flex items-center justify-between px-4 md:px-6">
-      {/* Search Input Removed */}
+      {/* Mobile Menu Toggle */}
+      <div className="md:hidden relative" ref={mobileMenuRef}>
+        <button 
+          onClick={() => setShowMobileMenu(!showMobileMenu)}
+          className="text-slate-400 hover:text-white transition-colors pr-4 border-r border-slate-700 h-8 flex items-center"
+        >
+          {showMobileMenu ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        </button>
+        
+        {showMobileMenu && (
+          <div className="absolute left-0 mt-5 w-64 bg-slate-900 border border-slate-700 rounded-lg shadow-xl overflow-hidden z-50">
+            <div className="p-2 max-h-[80vh] overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-slate-900 [&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-slate-600">
+              {filteredNavItems.map((item) => (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  onClick={() => setShowMobileMenu(false)}
+                  className={({ isActive }) => cn(
+                    "flex items-center gap-3 px-3 py-3 rounded-lg transition-colors font-medium text-sm mb-1",
+                    isActive 
+                      ? "bg-brand-blue/20 text-brand-cyan" 
+                      : "text-slate-400 hover:text-slate-100 hover:bg-slate-800/50"
+                  )}
+                >
+                  <item.icon className="w-5 h-5" />
+                  {item.label}
+                </NavLink>
+              ))}
+              <div className="border-t border-slate-800 mt-2 pt-2">
+                <button 
+                  onClick={() => { setShowMobileMenu(false); logout(); }}
+                  className="flex w-full items-center gap-3 px-3 py-3 rounded-lg text-red-500 hover:bg-red-500/10 transition-colors font-medium text-sm"
+                >
+                  <LogOut className="w-5 h-5" />
+                  Logout
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
       <div className="flex-1"></div>
 
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-4 md:gap-6">
         <div className="relative" ref={dropdownRef}>
           <button 
             onClick={() => setShowNotifications(!showNotifications)}
@@ -54,7 +95,7 @@ export function Topbar() {
           </button>
 
           {showNotifications && (
-            <div className="absolute right-0 mt-2 w-80 bg-slate-900 border border-slate-700 rounded-lg shadow-xl overflow-hidden z-50">
+            <div className="absolute -right-16 md:right-0 mt-2 w-[calc(100vw-2rem)] max-w-sm md:w-80 bg-slate-900 border border-slate-700 rounded-lg shadow-xl overflow-hidden z-50">
               <div className="p-3 border-b border-slate-800 flex justify-between items-center bg-slate-800/50">
                 <h3 className="text-sm font-semibold text-white">Notifications</h3>
                 <button onClick={() => { setShowNotifications(false); navigate('/alerts'); }} className="text-xs text-brand-cyan hover:underline">
@@ -107,48 +148,6 @@ export function Topbar() {
           </div>
           <UserCircle className="w-8 h-8 text-slate-400 hover:text-brand-cyan transition-colors" />
         </button>
-
-        {/* Mobile Menu Toggle */}
-        <div className="md:hidden relative" ref={mobileMenuRef}>
-          <button 
-            onClick={() => setShowMobileMenu(!showMobileMenu)}
-            className="text-slate-400 hover:text-white transition-colors pl-4 border-l border-slate-700 h-8 flex items-center"
-          >
-            {showMobileMenu ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
-          
-          {showMobileMenu && (
-            <div className="absolute right-0 mt-5 w-64 bg-slate-900 border border-slate-700 rounded-lg shadow-xl overflow-hidden z-50">
-              <div className="p-2 max-h-[80vh] overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-slate-900 [&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-slate-600">
-                {filteredNavItems.map((item) => (
-                  <NavLink
-                    key={item.path}
-                    to={item.path}
-                    onClick={() => setShowMobileMenu(false)}
-                    className={({ isActive }) => cn(
-                      "flex items-center gap-3 px-3 py-3 rounded-lg transition-colors font-medium text-sm mb-1",
-                      isActive 
-                        ? "bg-brand-blue/20 text-brand-cyan" 
-                        : "text-slate-400 hover:text-slate-100 hover:bg-slate-800/50"
-                    )}
-                  >
-                    <item.icon className="w-5 h-5" />
-                    {item.label}
-                  </NavLink>
-                ))}
-                <div className="border-t border-slate-800 mt-2 pt-2">
-                  <button 
-                    onClick={() => { setShowMobileMenu(false); logout(); }}
-                    className="flex w-full items-center gap-3 px-3 py-3 rounded-lg text-red-500 hover:bg-red-500/10 transition-colors font-medium text-sm"
-                  >
-                    <LogOut className="w-5 h-5" />
-                    Logout
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
       </div>
     </header>
   );
