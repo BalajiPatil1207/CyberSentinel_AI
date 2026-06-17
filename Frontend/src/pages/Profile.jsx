@@ -177,7 +177,7 @@ export function Profile() {
                 </div>
 
                 <div className="pt-6 flex justify-end gap-3 border-t border-slate-800">
-                  <Button type="button" variant="outline" onClick={() => { setName(user?.name||''); setEmail(user?.email||''); setProfilePicture(user?.profilePicture||''); }} disabled={isSaving}>Cancel</Button>
+                  <Button type="button" variant="outline" onClick={() => navigate(-1)} disabled={isSaving}>Cancel</Button>
                   <Button type="submit" variant="cyan" className="shadow-[0_0_15px_rgba(0,240,255,0.3)]" disabled={isSaving || isUploading}>
                     <Save className="w-4 h-4 mr-2" />
                     {isSaving ? 'Saving...' : 'Save Changes'}
