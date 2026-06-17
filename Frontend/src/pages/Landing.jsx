@@ -90,11 +90,23 @@ export function Landing() {
       {/* Navbar */}
       <nav className="fixed top-0 w-full z-50 bg-[#0f172a]/80 backdrop-blur-md border-b border-slate-800 transition-all">
         <div className="flex items-center justify-between px-8 py-4 max-w-7xl mx-auto">
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => scrollToSection('home')}>
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-cyan to-blue-600 flex items-center justify-center shadow-[0_0_20px_rgba(0,240,255,0.3)]">
-              <Shield className="text-white w-6 h-6" />
+          <div className="flex items-center gap-4">
+            {/* Mobile Menu Button */}
+            <div className="md:hidden flex items-center">
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="text-slate-300 hover:text-white cursor-pointer relative z-50"
+              >
+                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
             </div>
-            <span className="text-2xl font-bold tracking-tight text-white hidden sm:block">CyberSentinel<span className="text-brand-cyan">.AI</span></span>
+
+            <div className="flex items-center gap-3 cursor-pointer" onClick={() => scrollToSection('home')}>
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-cyan to-blue-600 flex items-center justify-center shadow-[0_0_20px_rgba(0,240,255,0.3)]">
+                <Shield className="text-white w-6 h-6" />
+              </div>
+              <span className="text-2xl font-bold tracking-tight text-white hidden sm:block">CyberSentinel<span className="text-brand-cyan">.AI</span></span>
+            </div>
           </div>
 
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
@@ -110,16 +122,6 @@ export function Landing() {
               className="px-5 py-2 rounded-lg bg-brand-cyan text-brand-darker font-semibold text-sm hover:bg-[#00d0dd] transition-all shadow-[0_0_15px_rgba(0,240,255,0.4)] hover:shadow-[0_0_25px_rgba(0,240,255,0.6)] transform hover:-translate-y-0.5 cursor-pointer"
             >
               Get Started
-            </button>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center">
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="text-slate-300 hover:text-white cursor-pointer p-2 relative z-50"
-            >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
         </div>
