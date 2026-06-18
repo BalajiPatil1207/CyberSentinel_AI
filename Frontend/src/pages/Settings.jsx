@@ -18,7 +18,7 @@ export function Settings() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const response = await fetch('/api/settings', {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ""}/api/settings`, {
           headers: { ...getAuthHeaders() }
         });
         const result = await response.json();
@@ -43,7 +43,7 @@ export function Settings() {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const response = await fetch('/api/settings', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ""}/api/settings`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
