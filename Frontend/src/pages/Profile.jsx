@@ -47,7 +47,7 @@ export function Profile() {
 
     setIsUploading(true);
     try {
-      const response = await fetch('/api/upload', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ""}/api/upload`, {
         method: 'POST',
         headers: {
           ...getAuthHeaders()
@@ -71,7 +71,7 @@ export function Profile() {
     }
   };
 
-  const API_BASE_URL = 'http://localhost:5000'; // Fallback if not proxied
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"; // Fallback if not proxied
 
   const getImageUrl = (url) => {
     if (!url) return null;
