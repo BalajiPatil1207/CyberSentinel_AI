@@ -39,7 +39,7 @@ export function AIAssistant() {
   useEffect(() => {
     const loadHistory = async () => {
       try {
-        const response = await fetch('/api/security/ai-chat/history', {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ""}/api/security/ai-chat/history`, {
           headers: getAuthHeaders()
         });
         if (response.ok) {
@@ -81,7 +81,7 @@ export function AIAssistant() {
     setIsTyping(true);
 
     try {
-      const response = await fetch('/api/security/ai-chat', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ""}/api/security/ai-chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
