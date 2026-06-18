@@ -18,7 +18,7 @@ export const DataProvider = ({ children }) => {
 
     try {
       // Fetch alerts (accessible to all logged-in roles)
-      const resAlerts = await fetch("/api/alerts", { headers: getAuthHeaders() });
+      const resAlerts = await fetch(`${import.meta.env.VITE_API_BASE_URL || ""}/api/alerts`, { headers: getAuthHeaders() });
       if (resAlerts.ok) {
         const data = await resAlerts.json();
         setAlerts(data.data || []);
@@ -26,19 +26,19 @@ export const DataProvider = ({ children }) => {
 
       // Fetch threats (restricted to Super Admin and Security Analyst)
       if (user.role === "Super Admin" || user.role === "Security Analyst") {
-        const resThreats = await fetch("/api/threats", { headers: getAuthHeaders() });
+        const resThreats = await fetch(`${import.meta.env.VITE_API_BASE_URL || ""}/api/threats`, { headers: getAuthHeaders() });
         if (resThreats.ok) {
           const data = await resThreats.json();
           setThreats(data.data || []);
         }
 
-        const resIncidents = await fetch("/api/incidents", { headers: getAuthHeaders() });
+        const resIncidents = await fetch(`${import.meta.env.VITE_API_BASE_URL || ""}/api/incidents`, { headers: getAuthHeaders() });
         if (resIncidents.ok) {
           const data = await resIncidents.json();
           setIncidents(data.data || []);
         }
 
-        const resVulns = await fetch("/api/security/vulnerabilities", { headers: getAuthHeaders() });
+        const resVulns = await fetch(`${import.meta.env.VITE_API_BASE_URL || ""}/api/security/vulnerabilities`, { headers: getAuthHeaders() });
         if (resVulns.ok) {
           const data = await resVulns.json();
           setVulnerabilities(data.data || []);
@@ -47,7 +47,7 @@ export const DataProvider = ({ children }) => {
 
       // Fetch users (restricted to Super Admin only)
       if (user.role === "Super Admin") {
-        const resUsers = await fetch("/api/users", { headers: getAuthHeaders() });
+        const resUsers = await fetch(`${import.meta.env.VITE_API_BASE_URL || ""}/api/users`, { headers: getAuthHeaders() });
         if (resUsers.ok) {
           const data = await resUsers.json();
           setUsers(data.data || []);
@@ -64,7 +64,7 @@ export const DataProvider = ({ children }) => {
     if (!user) return;
 
     // Connect to server socket
-    const socketUrl = import.meta.env.DEV ? "http://localhost:5000" : window.location.origin;
+    const socketUrl = import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? "http://localhost:5000" : window.location.origin);
     const socket = io(socketUrl, {
       transports: ["polling", "websocket"],
       autoConnect: true,
@@ -102,7 +102,7 @@ export const DataProvider = ({ children }) => {
   // Operations
   const addIncident = async (newIncident) => {
     try {
-      const response = await fetch("/api/incidents", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ""}/api/incidents`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -124,7 +124,7 @@ export const DataProvider = ({ children }) => {
 
   const updateIncident = async (id, updates) => {
     try {
-      const response = await fetch(`/api/incidents/${id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ""}/api/incidents/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -148,7 +148,7 @@ export const DataProvider = ({ children }) => {
 
   const addIncidentNote = async (id, text) => {
     try {
-      const response = await fetch(`/api/incidents/${id}/notes`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ""}/api/incidents/${id}/notes`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -172,7 +172,7 @@ export const DataProvider = ({ children }) => {
 
   const markAlertAsRead = async (id) => {
     try {
-      const response = await fetch(`/api/alerts/${id}/read`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ""}/api/alerts/${id}/read`, {
         method: "PATCH",
         headers: getAuthHeaders(),
       });
@@ -190,7 +190,7 @@ export const DataProvider = ({ children }) => {
   const toggleUserStatus = async (id, currentStatus) => {
     const nextStatus = currentStatus === "Active" ? "Inactive" : "Active";
     try {
-      const response = await fetch(`/api/users/${id}/status`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ""}/api/users/${id}/status`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -215,7 +215,7 @@ export const DataProvider = ({ children }) => {
 
   const deleteUser = async (id) => {
     try {
-      const response = await fetch(`/api/users/${id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ""}/api/users/${id}`, {
         method: "DELETE",
         headers: getAuthHeaders(),
       });
