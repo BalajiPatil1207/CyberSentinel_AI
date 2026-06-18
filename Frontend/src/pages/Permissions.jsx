@@ -54,7 +54,7 @@ export function Permissions() {
     if (!selectedUser) return;
     setSaving(true);
     try {
-      const response = await fetch(`/api/users/${selectedUser._id || selectedUser.id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ""}/api/users/${selectedUser._id || selectedUser.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
