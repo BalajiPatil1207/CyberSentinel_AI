@@ -7,8 +7,8 @@ import { Input } from '../components/Input';
 import { Button } from '../components/Button';
 
 export function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('admin@patilcybershield.com');
+  const [password, setPassword] = useState('P@tilcybershield1207');
   const [showPassword, setShowPassword] = useState(false);
 
   const [emailError, setEmailError] = useState('');
@@ -134,6 +134,12 @@ export function Login() {
                 Authenticate Securely
               </Button>
             </form>
+
+            <div className="mt-4 p-3 bg-brand-cyan/10 border border-brand-cyan/20 rounded-lg text-xs text-slate-300 text-center">
+              <p className="font-semibold mb-1 text-brand-cyan">Teacher / Demo Credentials:</p>
+              <p>Email: admin@patilcybershield.com</p>
+              <p>Password: P@tilcybershield1207</p>
+            </div>
 
             <div className="mt-6 pt-4 border-t border-slate-800 text-center">
               <p className="text-[10px] text-slate-600 mt-4">
