@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/Card';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
-import { Save } from 'lucide-react';
+import { Save, Shield } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 
@@ -71,7 +71,18 @@ export function Settings() {
   };
 
   if (isLoading) {
-    return <div className="text-slate-400">Loading settings...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-brand-cyan">
+        <div className="relative flex items-center justify-center w-12 h-12 mb-4">
+          <div className="absolute inset-0 border-4 border-brand-cyan/20 rounded-full"></div>
+          <div className="absolute inset-0 border-4 border-brand-cyan border-t-transparent rounded-full animate-spin"></div>
+          <Shield className="w-5 h-5 text-brand-cyan animate-pulse" />
+        </div>
+        <p className="text-sm font-semibold tracking-widest text-brand-cyan/80 animate-pulse">
+          LOADING SETTINGS...
+        </p>
+      </div>
+    );
   }
 
   return (
