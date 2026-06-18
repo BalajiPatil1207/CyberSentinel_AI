@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }) => {
       if (token && storedUser) {
         try {
           // Verify token against backend /api/auth/me
-          const response = await fetch("/api/auth/me", {
+          const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ""}/api/auth/me`, {
             headers: {
               ...getAuthHeaders(),
             },
@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await fetch("/api/auth/login", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ""}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -81,7 +81,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (name, email, password, role = "Employee") => {
     try {
-      const response = await fetch("/api/auth/register", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ""}/api/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -114,7 +114,7 @@ export const AuthProvider = ({ children }) => {
 
   const updateProfile = async (name, email, profilePicture) => {
     try {
-      const response = await fetch("/api/auth/profile", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ""}/api/auth/profile`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
