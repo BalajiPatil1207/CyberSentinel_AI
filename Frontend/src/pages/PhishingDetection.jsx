@@ -35,7 +35,7 @@ export function PhishingDetection() {
     setError('');
 
     try {
-      const response = await fetch('/api/security/phishing-scan', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ""}/api/security/phishing-scan`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
