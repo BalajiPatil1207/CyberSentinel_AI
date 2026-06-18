@@ -14,7 +14,7 @@ export function Reports() {
     setGeneratingPDF(true);
     setError('');
     try {
-      const response = await fetch('/api/reports/export-pdf', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ""}/api/reports/export-pdf`, {
         headers: getAuthHeaders()
       });
 
@@ -44,7 +44,7 @@ export function Reports() {
     setGeneratingCSV(true);
     setError('');
     try {
-      const response = await fetch('/api/reports/export-csv', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ""}/api/reports/export-csv`, {
         headers: getAuthHeaders()
       });
 
