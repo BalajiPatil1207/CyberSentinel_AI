@@ -103,7 +103,7 @@ export function UserManagement() {
 
     setLoading(true);
     try {
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ""}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -168,7 +168,7 @@ export function UserManagement() {
     setLoading(true);
 
     try {
-      const response = await fetch(`/api/users/${userToEdit._id || userToEdit.id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ""}/api/users/${userToEdit._id || userToEdit.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
