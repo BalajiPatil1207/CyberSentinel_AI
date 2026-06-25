@@ -66,7 +66,7 @@ export const DataProvider = ({ children }) => {
     // Connect to server socket
     const socketUrl = import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? "http://localhost:5000" : window.location.origin);
     const socket = io(socketUrl, {
-      transports: ["polling", "websocket"],
+      transports: ["websocket"],
       autoConnect: true,
     });
 
