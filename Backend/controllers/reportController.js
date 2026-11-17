@@ -168,7 +168,7 @@ const exportPDF = async (req, res, next) => {
       .fontSize(8)
       .fillColor("#94a3b8")
       .text(
-        "Confidential - Internal Auditing Use Only. ABC Cyber Shield systems are monitored 24/7/365.",
+        "Confidential - Internal Auditing Use Only. CyberSentinel AI systems are monitored 24/7/365.",
         50,
         700,
         { align: "center", width: 512 }

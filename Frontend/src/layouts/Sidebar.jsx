@@ -58,7 +58,7 @@ export function Sidebar() {
       <aside className="w-64 h-screen glass-panel rounded-none border-t-0 border-b-0 border-l-0 fixed left-0 top-0 hidden md:flex flex-col z-20">
         <div className="p-6 flex items-center gap-3">
           <Shield className="w-8 h-8 text-brand-cyan" />
-          <span className="font-bold text-lg tracking-wide text-white">ABC Cyber Shield</span>
+          <span className="font-bold text-lg tracking-wide text-white">CyberSentinel AI</span>
         </div>
         
         <div className="flex-1 overflow-y-auto py-4">

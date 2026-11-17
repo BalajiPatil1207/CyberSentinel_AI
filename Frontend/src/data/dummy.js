@@ -1,7 +1,7 @@
 export const dummyUsers = [
-  { id: 1, name: "Super Admin", email: "admin@patilcybershield.com", role: "Super Admin", status: "Active" },
-  { id: 2, name: "Security Analyst", email: "analyst@abccybershield.com", role: "Security Analyst", status: "Active" },
-  { id: 3, name: "Employee User", email: "employee@abccybershield.com", role: "Employee", status: "Active" },
+  { id: 1, name: "Super Admin", email: "admin@cybersentinel.com", role: "Super Admin", status: "Active" },
+  { id: 2, name: "Security Analyst", email: "analyst@cybersentinel.com", role: "Security Analyst", status: "Active" },
+  { id: 3, name: "Employee User", email: "employee@cybersentinel.com", role: "Employee", status: "Active" },
 ];
 
 export const dummyThreats = [
@@ -19,12 +19,12 @@ export const dummyIncidents = [
 
 export const dummyAlerts = [
   { id: 1, message: "Critical Malware Detected on Workstation-12", type: "critical", isRead: false, timestamp: "2026-06-11T11:15:00Z" },
-  { id: 2, message: "Multiple failed login attempts for user admin@abccybershield.com", type: "warning", isRead: false, timestamp: "2026-06-11T10:45:00Z" },
+  { id: 2, message: "Multiple failed login attempts for user admin@cybersentinel.com", type: "warning", isRead: false, timestamp: "2026-06-11T10:45:00Z" },
 ];
 
 export const dummyVulnerabilities = [
   { cve: "CVE-2024-3456", target: "192.168.1.10", severity: "Critical", description: "Remote code execution vulnerability.", status: "Open" },
-  { cve: "CVE-2023-1234", target: "abccybershield.com", severity: "Medium", description: "Cross-site scripting vulnerability.", status: "Resolved" },
+  { cve: "CVE-2023-1234", target: "cybersentinel.com", severity: "Medium", description: "Cross-site scripting vulnerability.", status: "Resolved" },
 ];
 
 export const getInitialData = (key, defaultData) => {

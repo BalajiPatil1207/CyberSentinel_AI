@@ -8,8 +8,8 @@ import { useAuth } from '../context/AuthContext';
 
 export function Settings() {
   const { getAuthHeaders } = useAuth();
-  const [companyName, setCompanyName] = useState('ABC Corporation');
-  const [supportEmail, setSupportEmail] = useState('security@abccybershield.com');
+  const [companyName, setCompanyName] = useState('CyberSentinel Enterprise');
+  const [supportEmail, setSupportEmail] = useState('security@cybersentinel.com');
   const [require2FA, setRequire2FA] = useState(true);
   const [autoBlockIPs, setAutoBlockIPs] = useState(true);
   const [isLoading, setIsLoading] = useState(true);

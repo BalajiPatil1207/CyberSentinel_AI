@@ -8,7 +8,7 @@ const SettingSchema = new mongoose.Schema(
     },
     supportEmail: {
       type: String,
-      default: "security@abccybershield.com",
+      default: "security@cybersentinel.com",
     },
     require2FA: {
       type: Boolean,

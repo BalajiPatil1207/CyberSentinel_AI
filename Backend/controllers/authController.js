@@ -165,7 +165,8 @@ const updateUserStatus = async (req, res, next) => {
     }
 
     // Do not allow deactivating the main super admin account
-    if (user.email === "admin@patilcybershield.com" && status === "Inactive") {
+    const superAdminEmails = ["admin@cybersentinel.com", "admin@patilcybershield.com"];
+    if (superAdminEmails.includes(user.email) && status === "Inactive") {
       throwBadRequest("The primary Super Admin user account cannot be deactivated.");
     }
 
@@ -202,7 +203,8 @@ const deleteUser = async (req, res, next) => {
     }
 
     // Do not allow deleting the main super admin account
-    if (user.email === "admin@patilcybershield.com") {
+    const superAdminEmails = ["admin@cybersentinel.com", "admin@patilcybershield.com"];
+    if (superAdminEmails.includes(user.email)) {
       throwBadRequest("The primary Super Admin user account cannot be deleted.");
     }
 
@@ -229,7 +231,8 @@ const editUser = async (req, res, next) => {
       throwNotFound(`User with ID ${id} not found.`);
     }
 
-    if (user.email === "admin@patilcybershield.com") {
+    const superAdminEmails = ["admin@cybersentinel.com", "admin@patilcybershield.com"];
+    if (superAdminEmails.includes(user.email)) {
       throwBadRequest("The primary Super Admin user account cannot be edited.");
     }
 

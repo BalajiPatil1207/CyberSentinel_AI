@@ -55,7 +55,8 @@ export function Login() {
       // Redirection handled dynamically inside DashboardRedirect helper or role based
       const storedUsers = JSON.parse(localStorage.getItem("cs_users")) || [];
       const found = storedUsers.find(u => u.email === email);
-      const activeRole = found ? found.role : (email === "admin@patilcybershield.com" ? "Super Admin" : "Employee");
+      const isSuperAdminEmail = ["admin@cybersentinel.com", "admin@patilcybershield.com"].includes(email);
+      const activeRole = found ? found.role : (isSuperAdminEmail ? "Super Admin" : "Employee");
       navigate(activeRole === 'Employee' ? '/phishing-detection' : '/dashboard');
     } else {
       setError(result.message);
@@ -73,7 +74,7 @@ export function Login() {
         
         <Card className="backdrop-blur-xl bg-slate-900/80">
           <CardHeader className="text-center border-b-0 pb-2">
-            <CardTitle className="text-2xl text-white">ABC Cyber Shield</CardTitle>
+            <CardTitle className="text-2xl text-white">CyberSentinel AI</CardTitle>
             <p className="text-slate-400 text-sm mt-2">
               Sign in to access the control center
             </p>
@@ -92,7 +93,7 @@ export function Login() {
                   <Mail className="absolute left-3 top-2.5 h-5 w-5 text-slate-500" />
                   <Input 
                     type="email" 
-                    placeholder="name@patilcybershield.com" 
+                    placeholder="name@cybersentinel.com" 
                     className={`pl-10 ${emailError ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -136,9 +137,9 @@ export function Login() {
             </form>
 
             <div className="mt-4 p-3 bg-brand-cyan/10 border border-brand-cyan/20 rounded-lg text-xs text-slate-300 text-center">
-              <p className="font-semibold mb-1 text-brand-cyan">Teacher / Demo Credentials:</p>
-              <p>Email: admin@patilcybershield.com</p>
-              <p>Password: P@tilcybershield1207</p>
+              <p className="font-semibold mb-1 text-brand-cyan">Demo Credentials:</p>
+              <p>Email: admin@cybersentinel.com</p>
+              <p>Password: CyberSentinel@123</p>
             </div>
 
             <div className="mt-6 pt-4 border-t border-slate-800 text-center">

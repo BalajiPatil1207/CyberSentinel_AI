@@ -252,7 +252,7 @@ export function UserManagement() {
                     <Mail className="absolute left-3 top-2.5 h-5 w-5 text-slate-500" />
                     <Input 
                       type="email" 
-                      placeholder="user@patilcybershield.com" 
+                      placeholder="user@cybersentinel.com" 
                       className="pl-10"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}

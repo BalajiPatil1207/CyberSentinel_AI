@@ -13,7 +13,7 @@ export function AIAssistant() {
     {
       id: 'default',
       role: 'ai',
-      content: 'Hello! I am your ABC Cyber Shield AI Assistant. I can help you analyze threats, explain vulnerabilities, or suggest security policies. How can I assist you today?'
+      content: 'Hello! I am your CyberSentinel AI Assistant. I can help you analyze threats, explain vulnerabilities, or suggest security policies. How can I assist you today?'
     }
   ]);
   const [input, setInput] = useState('');
